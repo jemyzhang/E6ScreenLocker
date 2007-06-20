@@ -1,0 +1,26 @@
+/* XPM */
+static const char *D2_xpm[] = {
+/* width height num_colors chars_per_pixel */
+"    11    11        8            1",
+/* colors */
+"` c #000000",
+". c #9c9a9c",
+"# c #454345",
+"a c #ffffff",
+"b c #242224",
+"c c #747574",
+"d c #babbba",
+"e c #3a3c3a",
+/* pixels */
+"aaaaa#``bca",
+"aaaaa#````c",
+"aaaaaaaadb`",
+"aaaaaaaaa#`",
+"aaadddddc`b",
+"ac````````c",
+".``e#####.a",
+"#`daaaaaaaa",
+"#`daaaaaaaa",
+"#`eeeeeeeee",
+"#``````````"
+};

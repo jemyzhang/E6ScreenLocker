@@ -1,0 +1,26 @@
+/* XPM */
+static const char *D6_xpm[] = {
+/* width height num_colors chars_per_pixel */
+"    11    11        8            1",
+/* colors */
+"` c #000000",
+". c #aaabaa",
+"# c #5c5a5c",
+"a c #e7e9e7",
+"b c #2d2d2d",
+"c c #cccecc",
+"d c #7b7d7b",
+"e c #ffffff",
+/* pixels */
+"edb```eeeee",
+"d`````eeeee",
+"``.aeeeeeee",
+"`bdddddd.ae",
+"``````````c",
+"`bddddd#b`b",
+"`beeeeeeeb`",
+"`beeeeeeeb`",
+"``.aeeea.``",
+"d`````````#",
+"edb`````bda"
+};

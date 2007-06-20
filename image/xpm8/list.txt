@@ -1,0 +1,1 @@
+C0.xpm+C1.xpm+C2.xpm+C3.xpm+C4.xpm+C5.xpm+C6.xpm+C7.xpm+C8.xpm+C9.xpm+Ccolon.xpm+Cdot.xpm+D0.xpm+D1.xpm+D2.xpm+D3.xpm+D4.xpm+D5.xpm+D6.xpm+D7.xpm+D8.xpm+D9.xpm+Dcolon.xpm+Dsplash.xpm+Sun.xpm+Mon.xpm+Tue.xpm+Wen.xpm+Thu.xpm+Fri.xpm+Sat.xpm+am.xpm+pm.xpm+Call.xpm+Lock.xpm+Mail.xpm+logo.xpm pictures.h
