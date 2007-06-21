@@ -13,40 +13,27 @@
 
 class DGeniusCanvas : public QCanvas
 {
-	QCanvasSprite * Time_sprite[4];
-    QCanvasSprite *background_sprite;
-    QCanvasSprite *R_sprite;
-    QCanvasSprite *L_sprite;
-    QCanvasSprite *U_sprite;
-    QCanvasSprite *D_sprite;
-    QCanvasSprite *C_sprite;
-    QCanvasSprite *start_button_sprite;
-    QCanvasSprite *exit_button_sprite;
+	QCanvasSprite *Screen_sprite[16];
+    QCanvasSprite *Lock_sprite;
     QCanvasText *presskeyMsg;
+
+    QCanvasPixmap *Screen_img[16];
+    QCanvasPixmapArray *ScreenImg_array[16];// = new QCanvasPixmapArray( );
+
+    char **screen_xpm[16];
 
     void init( );
   public:
         
         /**
-         * Shows the background picture.
-         */
-        void showBackground( );
-        
-        /**
          * Shows the Right sprite.
          */
         
-        void showSpriteR( );
-        void showSpriteL( );
-        void showSpriteU( );
-        void showSpriteD( );
+        void showSpriteLock( );
         void showString( const QString& );
         void hideString( );
-        void hideSpriteR( );
-        void hideSpriteL( );
-        void hideSpriteU( );
-        void hideSpriteD( );
-
+        void hideSpriteLock( );
+        void setScreenSprite(char *digi);
         
     
         DGeniusCanvas( int w, int h ) : QCanvas( w, h )
@@ -59,21 +46,27 @@ class DGeniusCanvas : public QCanvas
     	 	presskeyMsg->setColor(qRgb( 180,64,64));
 	 
 	//setup time array
-		    QCanvasPixmap *Time_img[4];
-            QCanvasPixmapArray *TimeImg_array[4];// = new QCanvasPixmapArray( );
-        for(int i = 0; i < 4; i++)
-		{
-			Time_img[i] = new QCanvasPixmap(Cdigi_xpm[i],QPoint(-33 * i , -100));
-			TimeImg_array[i] = new QCanvasPixmapArray( );
-			TimeImg_array[i]->setImage(0, Time_img[i]);
-            Time_sprite[i] = new QCanvasSprite(TimeImg_array[i],this);
-            Time_sprite[i]->show();
-		}
+		    QCanvasPixmap *Lock_img;
+            QCanvasPixmapArray *Lockimg_array;// = new QCanvasPixmapArray( );
+
+            Lock_img = new QCanvasPixmap(Lock_xpm,QPoint(-80,-240));
+            Lockimg_array = new QCanvasPixmapArray( );
+            Lockimg_array->setImage(0,Lock_img);
+            Lock_sprite = new QCanvasSprite(Lockimg_array,this);
+
+            for(int i = 0; i < 16; i++)
+            {
+                ScreenImg_array[i] = new QCanvasPixmapArray( );
+                Screen_sprite[i] = new QCanvasSprite(ScreenImg_array[i],this);
+            }
             setBackgroundColor( qRgb( 0xff, 0xff, 0xff) );
         }
 
         
-        virtual ~DGeniusCanvas( ) { }
+        virtual ~DGeniusCanvas( ) {
+            delete[] Screen_sprite;
+            delete[] Screen_img;
+            delete[] ScreenImg_array; }
 
 };
 
