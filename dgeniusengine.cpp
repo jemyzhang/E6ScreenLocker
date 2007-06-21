@@ -16,21 +16,14 @@ void DGeniusEngine :: run( )
     while(1)
     {
         sleep(1);
-        if( ( timecnt % 2 ) == 0 && false == ishide)
-        {
-            hidepressed = false;
-            showpressed = false;
-            canvas->hideString();
-            canvas->hideSpriteLock();
-            canvas->update();
-        }
 
-        if( ( timecnt % 10 ) == 0 && false == ishide)
+        struct tm *tm_ptr;
+        time_t now;
+        time(&now); 
+        tm_ptr = localtime(&now);
+
+        if( tm_ptr->tm_sec == 0 && false == ishide)
         {
-            struct tm *tm_ptr;
-            time_t now;
-            time(&now); 
-            tm_ptr = localtime(&now);
             char buf[11];
             char tmp;
             tmp = tm_ptr->tm_hour + 8;
@@ -55,12 +48,18 @@ void DGeniusEngine :: run( )
             buf[10] = tmp % 10;
             buf[11] = tm_ptr->tm_wday;
             std::cout<<"Ready for output date "<< ctime(&now) <<std::endl;
-            for (int i = 0; i < 12; i++) {
-                printf("%d ",buf[i]);
-            }
-            canvas->setScreenSprite(buf);
+           canvas->setScreenSprite(buf);
             canvas->update();
+            std::cout << "canvas updated" << std::endl;
 
+        }
+        if( ( timecnt % 2 ) == 0 && (true == hidepressed || true == showpressed))
+        {
+            hidepressed = false;
+            showpressed = false;
+            canvas->hideString();
+            canvas->hideSpriteLock();
+            canvas->update();
         }
         
         timecnt++;

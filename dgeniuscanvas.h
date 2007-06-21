@@ -8,7 +8,7 @@
 #include <qtextcodec.h>
 #include <stdio.h>
 #include "pictures.h"
-
+#include <time.h>
 #include "dgenius.h"
 
 class DGeniusCanvas : public QCanvas
@@ -38,7 +38,7 @@ class DGeniusCanvas : public QCanvas
     
         DGeniusCanvas( int w, int h ) : QCanvas( w, h )
         {
-       
+            init();
      		presskeyMsg = new QCanvasText("Unlock: Now Press Center Key",this);
     		QFont *strfont = new QFont();
     	 	strfont->setPixelSize(16);
@@ -53,12 +53,41 @@ class DGeniusCanvas : public QCanvas
             Lockimg_array = new QCanvasPixmapArray( );
             Lockimg_array->setImage(0,Lock_img);
             Lock_sprite = new QCanvasSprite(Lockimg_array,this);
-
+/*
             for(int i = 0; i < 16; i++)
             {
                 ScreenImg_array[i] = new QCanvasPixmapArray( );
                 Screen_sprite[i] = new QCanvasSprite(ScreenImg_array[i],this);
             }
+*/            struct tm *tm_ptr;
+            time_t now;
+            time(&now); 
+            tm_ptr = localtime(&now);
+            char buf[11];
+            char tmp;
+            tmp = tm_ptr->tm_hour + 8;
+            buf[4] = 0;
+            if(tmp > 12){
+                tmp = tmp - 12;
+                buf[4] = 1;
+            }
+            buf[0] = tmp / 10;
+            buf[1] = tmp % 10;
+            tmp = tm_ptr->tm_min;
+            buf[2] = tmp / 10;
+            buf[3] = tmp % 10;
+            tmp = tm_ptr->tm_year % 100;
+            buf[5] = tmp / 10;
+            buf[6] = tmp % 10;
+            tmp = tm_ptr->tm_mon + 1;
+            buf[7] = tmp / 10;
+            buf[8] = tmp % 10;
+            tmp = tm_ptr->tm_mday;
+            buf[9] = tmp / 10;
+            buf[10] = tmp % 10;
+            buf[11] = tm_ptr->tm_wday;
+            setScreenSprite(buf);
+
             setBackgroundColor( qRgb( 0xff, 0xff, 0xff) );
         }
 

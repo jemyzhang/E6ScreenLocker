@@ -66,27 +66,13 @@ class DApplication : public ZApplication {
                 break;
                 
                 case QWSEvent::Mouse:
-                    printf("mouse\n");
-                    mouse=event->asMouse();
+/*                    mouse=event->asMouse();
                     if (mouse==0)
                         return false;
-                    
-                    /*
-                    printf("mouse move at x=%d,y=%d,state=%d\n,
-                        mouse->simpleData.x_root,
-                        mouse->simpleData.y_root,
-                        mouse->simpleData.state);
-                     */
-                     
-                     x=mouse->simpleData.x_root;
+
+                    x=mouse->simpleData.x_root;
                      y=mouse->simpleData.y_root;
                      z=mouse->simpleData.state;
-                     
-                     /*printf("mouse move at x=%d,y=%d,state=%d\n",
-                     x,
-                     y,
-                     z);*/
-                     printf("");
                      
                      if ( pointerListener != 0 )
                      {
@@ -103,20 +89,13 @@ class DApplication : public ZApplication {
                         
                         press = z;
                      }
-                break;
+ */               break;
                  
                 case QWSEvent::Focus:
-                    focus=(QWSFocusEvent*)event;
-                    printf("focus %d\n",focus->simpleData.get_focus);
+/*                    focus=(QWSFocusEvent*)event;
                     if (focus->simpleData.get_focus==0) {
-                    /*
-                        if (ignore == 0) {
-                            ignore = 1;
-                            pthread_create( &thr_event_handler, NULL, event_handler, (void*)KeyEvent);
-                        }
-                        */
                     }
-                break;
+*/                break;
                 
                 case QWSEvent::Key:
                 
@@ -138,7 +117,6 @@ class DApplication : public ZApplication {
                         KeyEvent->simpleData.is_press,
                         KeyEvent->simpleData.is_auto_repeat);
                     pointerListener->keyPressed(KeyEvent->simpleData.keycode);
-                    //ZMessageBox::timerMessage(0, NULL,"teste",4);
                 break;
                 
                 case QWSEvent::RegionModified:
