@@ -15,6 +15,8 @@ class DGeniusCanvas : public QCanvas
 {
 	QCanvasSprite *Screen_sprite[12];
     QCanvasSprite *Lock_sprite;
+    QCanvasSprite *sms_sprite;
+    QCanvasSprite *Call_sprite;
     QCanvasText *presskeyMsg;
     char digi_buf[12];
 	char digi_backup[12];
@@ -26,9 +28,13 @@ class DGeniusCanvas : public QCanvas
         
      
         void showSpriteLock( );
+        void showSpritesms( );
+        void showSpriteCall( );
         void showString( const QString& );
-        void hideString( );
         void hideSpriteLock( );
+        void hideSpritesms( );
+        void hideSpriteCall( );
+        void hideString( );
         void updateScreenSprite( );
         
     
@@ -51,7 +57,18 @@ class DGeniusCanvas : public QCanvas
             Lockimg_array->setImage(0,Lock_img);
             Lock_sprite = new QCanvasSprite(Lockimg_array,this);
 
-	//setup time array
+
+            Lock_img = new QCanvasPixmap(Mail_xpm,QPoint(-20,-120));
+            Lockimg_array = new QCanvasPixmapArray( );
+            Lockimg_array->setImage(0,Lock_img);
+            sms_sprite = new QCanvasSprite(Lockimg_array,this);
+
+            Lock_img = new QCanvasPixmap(Call_xpm,QPoint(-20,-120));
+            Lockimg_array = new QCanvasPixmapArray( );
+            Lockimg_array->setImage(0,Lock_img);
+            Call_sprite = new QCanvasSprite(Lockimg_array,this);
+
+            //setup time array
             updateScreenSprite( );
 	//setup background color
             setBackgroundColor( qRgb( 0xff, 0xff, 0xff) );

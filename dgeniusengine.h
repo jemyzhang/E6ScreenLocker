@@ -6,6 +6,12 @@
 #include "dapplication.h"
 #include "dgeniuscanvas.h"
 
+/* added for backlight control */
+#define FBIOSETBKLIGHT          0x4619
+#define FBIOGETBKLIGHT          0x461A
+#define FBIOSETBRIGHTNESS       0x461B 
+#define FBIOGETBRIGHTNESS       0x461C 
+
 
 class DGeniusEngine : public QThread, PointerListener
 {
@@ -20,6 +26,8 @@ class DGeniusEngine : public QThread, PointerListener
         unsigned char timeout;
         void showScreenSaver();
         void hideScreenSaver();
+        void backlightctrl(bool onoff);
+        int backlightstatus( );
 
     public:
         DGeniusEngine( DGeniusCanvas *canvas_ )
@@ -39,6 +47,7 @@ class DGeniusEngine : public QThread, PointerListener
         void pointerReleased( int x, int y );
         void keyPressed(int keycode);
         void QcopAutoLock( );
+        void mousePressed( );
 };
 
 

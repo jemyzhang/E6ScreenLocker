@@ -65,6 +65,26 @@ void DGeniusCanvas :: hideSpriteLock( )
     Lock_sprite->hide( );
 }
 
+void DGeniusCanvas :: showSpritesms( )
+{
+    sms_sprite->show( );
+}
+
+void DGeniusCanvas :: hideSpritesms( )
+{
+    sms_sprite->hide( );
+}
+
+void DGeniusCanvas :: showSpriteCall( )
+{
+    Call_sprite->show( );
+}
+
+void DGeniusCanvas :: hideSpriteCall( )
+{
+    Call_sprite->hide( );
+}
+
 void DGeniusCanvas :: updateScreenSprite( )
 {
     get_time_ch();

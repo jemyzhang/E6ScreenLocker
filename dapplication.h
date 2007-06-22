@@ -30,6 +30,7 @@ class PointerListener
         virtual void pointerDragged( int x, int y) = 0;
         virtual void pointerReleased( int x, int y) = 0;
         virtual void QcopAutoLock( ) = 0;
+        virtual void mousePressed( ) = 0;
         virtual void keyPressed(int keycode) = 0;
 };
 
@@ -66,10 +67,11 @@ class DApplication : public ZApplication {
                 break;
                 
                 case QWSEvent::Mouse:
-/*                    mouse=event->asMouse();
+                    mouse=event->asMouse();
                     if (mouse==0)
                         return false;
-                    x=mouse->simpleData.x_root;
+                        pointerListener->mousePressed();
+/*                    x=mouse->simpleData.x_root;
                      y=mouse->simpleData.y_root;
                      z=mouse->simpleData.state;
                      
@@ -115,7 +117,9 @@ class DApplication : public ZApplication {
                         KeyEvent->simpleData.keycode,
                         KeyEvent->simpleData.is_press,
                         KeyEvent->simpleData.is_auto_repeat);
-                    pointerListener->keyPressed(KeyEvent->simpleData.keycode);
+                    if (KeyEvent->simpleData.is_press && !KeyEvent->simpleData.is_auto_repeat) {
+                        pointerListener->keyPressed(KeyEvent->simpleData.keycode);
+                    }
                 break;
                 
                 case QWSEvent::RegionModified:

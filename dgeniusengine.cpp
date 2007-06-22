@@ -6,13 +6,36 @@
 #include <iostream>
 #include <time.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <linux/fb.h>
+#include <fcntl.h>
+
+extern "C" int  UTIL_GetNotificationStatus();
 
 void DGeniusEngine :: run( )
 {
+    static bool fnotification = false;
     canvas->update( );
+    if(false == backlightstatus()) backlightctrl(true);
     while(1)
     {
         sleep(1);
+        bool fnotifi = UTIL_GetNotificationStatus();
+        if(fnotification != fnotifi)
+        {
+            printf("Notification status: %d\n",fnotifi);
+            fnotification = fnotifi;
+            if(fnotification)
+            {
+                canvas->showSpritesms();
+            }else
+            {
+                canvas->hideSpritesms();
+            }
+            canvas->update();
+        }
+ //       printf("Notification status: %d\n",UTIL_GetNotificationStatus());
 
         struct tm *tm_ptr;
         time_t now;
@@ -21,7 +44,6 @@ void DGeniusEngine :: run( )
 
         if (!ishide && !(view->isActiveWindow()) ) {    //check if screensaver is forced background
             showScreenSaver();
-            view->setActiveWindow();
             printf("force active:%d\n",view->isActiveWindow());
         }else if( ishide && view->isActiveWindow() )
         {
@@ -31,8 +53,9 @@ void DGeniusEngine :: run( )
 
         if (ishide) {
 //            timeout ++;   //disable auto screen lock, can not receive mouse event while minimized
+            timeout = 0;    //for backlight timeout
             //check timeout
-            if (timeout > 10 ) {
+            if (timeout > 5 ) {
                 printf("timeout,auto lock\n");
                 timeout = 0;
                 canvas->updateScreenSprite( );
@@ -41,7 +64,12 @@ void DGeniusEngine :: run( )
                 }
         }else
         {
-            timeout = 0;
+            //timeout = 0;
+            timeout ++;
+            if(timeout > 3){
+                timeout = 0;
+                if(true == backlightstatus()) backlightctrl(false);
+            }
         }
 
         if( tm_ptr->tm_sec == 0 && false == ishide)
@@ -52,7 +80,6 @@ void DGeniusEngine :: run( )
         if( true == keypressed)
         {
             timecnt ++;
-            timeout = 0;
             if ( (timecnt % 2 ) ==0 ){
                 hidepressed = false;
                 showpressed = false;
@@ -85,6 +112,8 @@ void DGeniusEngine :: pointerReleased( int x, int y )
 void DGeniusEngine :: keyPressed(int keycode)
 {
     keypressed = true ;
+    timeout = 0;
+    if(false == backlightstatus()) backlightctrl(true);
     if (false == ishide) {
         if(4144 == keycode)
         {
@@ -123,10 +152,17 @@ void DGeniusEngine :: keyPressed(int keycode)
     }
 }
 
+void DGeniusEngine :: mousePressed( )
+{
+   // if (false == ishide && false == backlightstatus()) {
+        //backlightctrl(false);
+    //}
+}
+
 void DGeniusEngine :: QcopAutoLock( )
 {
     if (ishide) {
-        showScreenSaver();
+        //showScreenSaver();
     }
 }
 
@@ -150,3 +186,38 @@ void DGeniusEngine :: hideScreenSaver()
     ishide = true;
 }
 
+void DGeniusEngine :: backlightctrl(bool onoff)
+{
+    int fbd = open("/dev/fb0", O_RDWR);
+    if(fbd<0){
+    printf("can not open fb0\n");
+    return;
+    }
+ 
+    ioctl(fbd,FBIOBLANK,0);
+    ioctl(fbd,FBIOSETBKLIGHT,onoff);
+
+    close(fbd);
+    printf("Set backlight %s\n",onoff == true ?  "ON" : "OFF");
+}
+
+int DGeniusEngine :: backlightstatus( )
+{
+
+    int fbd = open("/dev/fb0", O_RDWR);
+    int status = 0;
+    if(fbd<0){
+    printf("can not open fb0\n");
+    return false ;
+    }
+ 
+    ioctl(fbd,FBIOBLANK,0);
+    if(ioctl(fbd,FBIOGETBKLIGHT,&status) < 0)
+    {
+        printf("backlight status : get status error\n");
+    }
+
+    close(fbd);
+    printf("Backlight status %d\n",status);
+    return status;
+}
