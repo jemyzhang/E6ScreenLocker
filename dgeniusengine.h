@@ -13,16 +13,19 @@ class DGeniusEngine : public QThread, PointerListener
         DGeniusCanvas *canvas;
         QCanvasView *view;
         bool running;
+        bool keypressed;
         bool hidepressed;
         bool showpressed;
         bool ishide;
         unsigned char timecnt;
+        unsigned char timeout;
 
     public:
         DGeniusEngine( DGeniusCanvas *canvas_ )
         {
             canvas = canvas_;
             running = false;
+            keypressed = false;
             hidepressed = false;
             showpressed = false;
             ishide = false;

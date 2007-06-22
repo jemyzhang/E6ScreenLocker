@@ -65,7 +65,7 @@ class DGeniusCanvas : public QCanvas
             tm_ptr = localtime(&now);
             char buf[11];
             char tmp;
-            tmp = tm_ptr->tm_hour + 8;
+            tmp = tm_ptr->tm_hour;// + 8;
             buf[4] = 0;
             if(tmp > 12){
                 tmp = tmp - 12;

@@ -22,11 +22,22 @@ void DGeniusEngine :: run( )
         time(&now); 
         tm_ptr = localtime(&now);
 
+        if (timeout > 10) {
+            printf("timeout,auto lock\n");
+            timeout = 0;
+            ishide = false;
+        }
+        if (ishide) {
+            view->hide();
+        }else
+        {
+            view->show();
+        }
         if( tm_ptr->tm_sec == 0 && false == ishide)
         {
             char buf[11];
             char tmp;
-            tmp = tm_ptr->tm_hour + 8;
+            tmp = tm_ptr->tm_hour;// + 8;
             buf[4] = 0;
             if(tmp > 12){
                 tmp = tmp - 12;
@@ -53,16 +64,21 @@ void DGeniusEngine :: run( )
             std::cout << "canvas updated" << std::endl;
 
         }
-        if( ( timecnt % 2 ) == 0 && (true == hidepressed || true == showpressed))
+        if( true == keypressed)
         {
-            hidepressed = false;
-            showpressed = false;
-            canvas->hideString();
-            canvas->hideSpriteLock();
-            canvas->update();
+            timecnt ++;
+            timeout = 0;
+            if ( (timecnt % 2 ) ==0 ){
+                hidepressed = false;
+                showpressed = false;
+                keypressed = false;
+                canvas->hideString();
+                canvas->hideSpriteLock();
+                canvas->update();
+            }
         }
+        timeout ++;
         
-        timecnt++;
     }
     running = false;
 }
@@ -85,6 +101,7 @@ void DGeniusEngine :: pointerReleased( int x, int y )
 
 void DGeniusEngine :: keyPressed(int keycode)
 {
+    keypressed = true ;
     if (false == ishide) {
     	if(4144 == keycode)
     	{
@@ -130,8 +147,10 @@ void DGeniusEngine :: setview(QCanvasView *canvasview)
 
 void DGeniusEngine :: showScreenSaver()
 {
+    /*
     canvas->hideString();
     showpressed = false;
     view->show();
     ishide = false;
+    */
 }
