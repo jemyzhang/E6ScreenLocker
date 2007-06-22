@@ -16,8 +16,12 @@ class DGeniusCanvas : public QCanvas
 	QCanvasSprite *Screen_sprite[12];
     QCanvasSprite *Lock_sprite;
     QCanvasText *presskeyMsg;
+    char digi_buf[12];
 	char digi_backup[12];
+
     void init( );
+    void get_time_ch();
+
   public:
         
      
@@ -25,7 +29,7 @@ class DGeniusCanvas : public QCanvas
         void showString( const QString& );
         void hideString( );
         void hideSpriteLock( );
-        void setScreenSprite(char *digi);
+        void updateScreenSprite( );
         
     
         DGeniusCanvas( int w, int h ) : QCanvas( w, h )
@@ -48,34 +52,7 @@ class DGeniusCanvas : public QCanvas
             Lock_sprite = new QCanvasSprite(Lockimg_array,this);
 
 	//setup time array
-            struct tm *tm_ptr;
-            time_t now;
-            time(&now); 
-            tm_ptr = localtime(&now);
-            char buf[11];
-            char tmp;
-            tmp = tm_ptr->tm_hour;// + 8;
-            buf[4] = 0;
-            if(tmp > 12){
-                tmp = tmp - 12;
-                buf[4] = 1;
-            }
-            buf[0] = tmp / 10;
-            buf[1] = tmp % 10;
-            tmp = tm_ptr->tm_min;
-            buf[2] = tmp / 10;
-            buf[3] = tmp % 10;
-            tmp = tm_ptr->tm_year % 100;
-            buf[5] = tmp / 10;
-            buf[6] = tmp % 10;
-            tmp = tm_ptr->tm_mon + 1;
-            buf[7] = tmp / 10;
-            buf[8] = tmp % 10;
-            tmp = tm_ptr->tm_mday;
-            buf[9] = tmp / 10;
-            buf[10] = tmp % 10;
-            buf[11] = tm_ptr->tm_wday;
-            setScreenSprite(buf);
+            updateScreenSprite( );
 	//setup background color
             setBackgroundColor( qRgb( 0xff, 0xff, 0xff) );
         }

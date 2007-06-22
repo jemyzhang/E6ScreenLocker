@@ -12,19 +12,19 @@ class DGeniusEngine : public QThread, PointerListener
     private:
         DGeniusCanvas *canvas;
         QCanvasView *view;
-        bool running;
         bool keypressed;
         bool hidepressed;
         bool showpressed;
         bool ishide;
         unsigned char timecnt;
         unsigned char timeout;
+        void showScreenSaver();
+        void hideScreenSaver();
 
     public:
         DGeniusEngine( DGeniusCanvas *canvas_ )
         {
             canvas = canvas_;
-            running = false;
             keypressed = false;
             hidepressed = false;
             showpressed = false;
@@ -37,8 +37,8 @@ class DGeniusEngine : public QThread, PointerListener
         void pointerPressed( int x, int y );
         void pointerDragged( int x, int y );
         void pointerReleased( int x, int y );
-	void keyPressed(int keycode);
-    void showScreenSaver();
+        void keyPressed(int keycode);
+        void QcopAutoLock( );
 };
 
 

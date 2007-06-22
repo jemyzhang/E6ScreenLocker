@@ -29,8 +29,8 @@ class PointerListener
         virtual void pointerPressed( int x, int y) = 0;
         virtual void pointerDragged( int x, int y) = 0;
         virtual void pointerReleased( int x, int y) = 0;
-	 virtual void keyPressed(int keycode) = 0;
-     virtual void showScreenSaver() = 0;
+        virtual void QcopAutoLock( ) = 0;
+        virtual void keyPressed(int keycode) = 0;
 };
 
 class DApplication : public ZApplication {
@@ -69,7 +69,6 @@ class DApplication : public ZApplication {
 /*                    mouse=event->asMouse();
                     if (mouse==0)
                         return false;
-
                     x=mouse->simpleData.x_root;
                      y=mouse->simpleData.y_root;
                      z=mouse->simpleData.state;
@@ -159,8 +158,8 @@ class DApplication : public ZApplication {
                 break;
                 
                 case QWSEvent::QCopMessage:
-                    pointerListener->showScreenSaver();
                     printf("QCopMessage\n");
+                    pointerListener->QcopAutoLock();
                 break;
                 
                 case QWSEvent::WindowOperation:
