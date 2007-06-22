@@ -22,15 +22,19 @@ void DGeniusEngine :: run( )
         time(&now); 
         tm_ptr = localtime(&now);
 
-        if (timeout > 10) {
+			//check timeout
+        if (timeout > 10 && true == ishide) {
             printf("timeout,auto lock\n");
             timeout = 0;
+				view->show();
             ishide = false;
         }
         if (ishide) {
+	        timeout ++;
             view->hide();
         }else
         {
+				timeout = 0;
             view->show();
         }
         if( tm_ptr->tm_sec == 0 && false == ishide)
@@ -77,7 +81,6 @@ void DGeniusEngine :: run( )
                 canvas->update();
             }
         }
-        timeout ++;
         
     }
     running = false;

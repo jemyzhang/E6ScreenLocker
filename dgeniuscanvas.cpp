@@ -8,11 +8,19 @@
 
 void DGeniusCanvas :: init( )
 {
-    for (int i = 0; i< 16; i++) {
-        Screen_img[i] = NULL;
+		for( int i = 0; i < 12; i++)
+		{
         Screen_sprite[i] = NULL;
-        ScreenImg_array[i] = NULL;
-    }
+			digi_backup[i] = 0xff;
+		}
+		for( int i = 0; i < 4; i++) {
+	 		QCanvasPixmap *img = new QCanvasPixmap(static_screen_xpm[i],QPoint(static_screen_pos[i].x , static_screen_pos[i].y));
+			QCanvasPixmapArray *imgarray = new QCanvasPixmapArray( );
+			imgarray->setImage(0,img);
+			QCanvasSprite *static_Screen_sprite = new QCanvasSprite(imgarray,this);
+	      static_Screen_sprite->show();
+		}
+
 }
 
 
@@ -28,52 +36,40 @@ void DGeniusCanvas :: hideSpriteLock( )
 
 void DGeniusCanvas :: setScreenSprite(char *digi )
 {
-    screen_xpm[0] = (char **)logo_xpm;
-    screen_xpm[1] = (char **)Cdigi_xpm[*digi++];
-    screen_xpm[2] = (char **)Cdigi_xpm[*digi++];
-    screen_xpm[3] = (char **)Ccolon_xpm;
-    screen_xpm[4] = (char **)Cdigi_xpm[*digi++];
-    screen_xpm[5] = (char **)Cdigi_xpm[*digi++];
-    screen_xpm[6] = (char **)ampm_xpm[*digi++];
+    char **screen_xpm[12];
+    screen_xpm[0] = (char **)Cdigi_xpm[digi[0]];
+    screen_xpm[1] = (char **)Cdigi_xpm[digi[1]];
+    screen_xpm[2] = (char **)Cdigi_xpm[digi[2]];
+    screen_xpm[3] = (char **)Cdigi_xpm[digi[3]];
+    screen_xpm[4] = (char **)ampm_xpm[digi[4]];
 
-    screen_xpm[7] = (char **)Ddigi_xpm[*digi++];
-    screen_xpm[8] = (char **)Ddigi_xpm[*digi++];
-    screen_xpm[9] = (char **)Dhori_xpm;
-    screen_xpm[10] = (char **)Ddigi_xpm[*digi++];
-    screen_xpm[11] = (char **)Ddigi_xpm[*digi++];
-    screen_xpm[12] = (char **)Dhori_xpm;
-    screen_xpm[13] = (char **)Ddigi_xpm[*digi++];
-    screen_xpm[14] = (char **)Ddigi_xpm[*digi++];
+    screen_xpm[5] = (char **)Ddigi_xpm[digi[5]];
+    screen_xpm[6] = (char **)Ddigi_xpm[digi[6]];
+    screen_xpm[7] = (char **)Ddigi_xpm[digi[7]];
+    screen_xpm[8] = (char **)Ddigi_xpm[digi[8]];
+    screen_xpm[9] = (char **)Ddigi_xpm[digi[9]];
+    screen_xpm[10] = (char **)Ddigi_xpm[digi[10]];
 
-    screen_xpm[15] = (char **)Day_xpm[*digi++];
+    screen_xpm[11] = (char **)Day_xpm[digi[11]];
 
-    for(int i = 0; i < 16; i++)
+	printf("start to prepare image...\n");
+    for(int i = 0; i < 12; i++)
     {
-        if(Screen_sprite[i]) {
-            removeItem(Screen_sprite [i]);
-            Screen_sprite[i]->hide();
-            //delete ScreenImg_array[i];
-            delete Screen_sprite[i];
-            Screen_sprite[i] = NULL;
-            //ScreenImg_array[i] = NULL;
-        }
-        if (Screen_img[i]) {
-            *Screen_img[i] = QCanvasPixmap((const char**)screen_xpm[i],QPoint(screen_pos[i].x , screen_pos[i].y));
-        }else
-        {
-            Screen_img[i] = new QCanvasPixmap((const char**)screen_xpm[i],QPoint(screen_pos[i].x , screen_pos[i].y));
-        }
-        if (ScreenImg_array[i]) {
-            *ScreenImg_array[i] = QCanvasPixmapArray( );
-        }else
-        {
-            ScreenImg_array[i] = new QCanvasPixmapArray();
-        }
-        //printf("array:%p\n",ScreenImg_array[i]);
-        ScreenImg_array[i]->setImage(0, Screen_img[i]);
-        Screen_sprite[i] = new QCanvasSprite(ScreenImg_array[i],this);
-        Screen_sprite[i]->show();
-    }
+        if(digi_backup[i] != digi[i]) {
+				if(Screen_sprite[i])
+				{
+	            removeItem(Screen_sprite[i]);
+	            delete Screen_sprite[i];
+	            Screen_sprite[i] = NULL;
+				}
+		 		QCanvasPixmap *img = new QCanvasPixmap((const char**)screen_xpm[i],QPoint(screen_pos[i].x , screen_pos[i].y));
+				QCanvasPixmapArray *imgarray = new QCanvasPixmapArray( );
+				imgarray->setImage(0,img);
+				Screen_sprite[i] = new QCanvasSprite(imgarray,this);
+		      Screen_sprite[i]->show();
+				digi_backup[i] = digi[i];
+		}
+   }
 
 }
 
@@ -88,9 +84,4 @@ void DGeniusCanvas :: hideString( )
 {
 	presskeyMsg->hide();
 }
-/*
-void DGeniusCanvas :: advance()
-{
-    std::cout<<"period output"<<std::endl;
-}
-*/
+

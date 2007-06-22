@@ -2228,13 +2228,32 @@ typedef struct QPoint_st {
     int x;
     int y;
 };
-static const QPoint_st screen_pos[] ={
-//    logo_xpm,C0_xpm,      C0_xpm,         Ccolon_xpm,     C0_xpm,         C0_xpm,             am_xpm,
-    {-20,-120},{-50,-140},{-50-33*1,-140},{-50-33*2,-140},{-50-33*2-8,-140},{-50-33*3-8,-140},{-170,-130},
-//    D0_xpm,         D0_xpm,         Dhori_xpm,      D0_xpm,         D0_xpm,         Dhori_xpm,      D0_xpm,         D0_xpm,Mon_xpm,
-    {-70-11*0,-180},{-70-11*1,-180},{-70-11*2,-180},{-78-11*2,-180},
-    {-78-11*3,-180},{-78-11*4,-180},{-86-11*4,-180},{-86-11*5,-180},{-10,-118}
+static const QPoint_st static_screen_pos[] ={
+//    static image positons
+   {-20,-120},		//    logo_xpm,	
+	{-50-33*2,-140},		//Ccolon_xpm
+	{-70-11*2,-180},				//Dhori_xpm
+	{-78-11*4,-180},	//Dhori_xpm
 };
+static const QPoint_st screen_pos[] ={
+//	dynamic image positons
+	{-50,-140},				//C0_xpm,
+	{-50-33*1,-140},				//C0_xpm,
+	{-50-33*2-8,-140},			//C0_xpm,
+	{-50-33*3-8,-140},		//C0_xpm,
+	{-170,-130},						//am_xpm
+   {-70-11*0,-180},	//D0_xpm
+	{-70-11*1,-180},			//D0_xpm
+	{-78-11*2,-180},			//D0_xpm
+   {-78-11*3,-180},	//D0_xpm
+	{-86-11*4,-180},	//D0_xpm
+	{-86-11*5,-180},		//D0_xpm
+	{-10,-118},	//Mon_xpm
+};
+static const char **static_screen_xpm[] = {
+	logo_xpm,Ccolon_xpm,Dhori_xpm,Dhori_xpm,
+};
+
 static const char *Cdigi_array[] = { 
 "image/C0.xpm",
 "image/C1.xpm",
