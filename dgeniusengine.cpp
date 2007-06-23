@@ -12,15 +12,28 @@
 #include <fcntl.h>
 
 extern "C" int  UTIL_GetNotificationStatus();
+extern "C" int  UTIL_GetBtStatus();
 
 void DGeniusEngine :: run( )
 {
     static bool fnotification = false;
+    static bool btstatus = false;
+
     canvas->update( );
     if(false == backlightstatus()) backlightctrl(true);
     while(1)
     {
         sleep(1);
+        bool bt_ = UTIL_GetBtStatus();
+        if(btstatus != bt_){
+            btstatus = bt_;
+            if (btstatus) {
+                canvas->showSpriteBT();
+            }else
+            {
+                canvas->hideSpriteBT ();
+            }
+        }
         bool fnotifi = UTIL_GetNotificationStatus();
         if(fnotification != fnotifi)
         {
@@ -29,13 +42,14 @@ void DGeniusEngine :: run( )
             if(fnotification)
             {
                 canvas->showSpritesms();
+                canvas->showSpriteCall();
             }else
             {
                 canvas->hideSpritesms();
+                canvas->hideSpriteCall();
             }
             canvas->update();
         }
- //       printf("Notification status: %d\n",UTIL_GetNotificationStatus());
 
         struct tm *tm_ptr;
         time_t now;

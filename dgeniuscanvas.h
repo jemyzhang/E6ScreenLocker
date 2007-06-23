@@ -17,6 +17,7 @@ class DGeniusCanvas : public QCanvas
     QCanvasSprite *Lock_sprite;
     QCanvasSprite *sms_sprite;
     QCanvasSprite *Call_sprite;
+    QCanvasSprite *BT_sprite;
     QCanvasText *presskeyMsg;
     char digi_buf[12];
 	char digi_backup[12];
@@ -29,11 +30,13 @@ class DGeniusCanvas : public QCanvas
      
         void showSpriteLock( );
         void showSpritesms( );
+        void showSpriteBT( );
         void showSpriteCall( );
         void showString( const QString& );
         void hideSpriteLock( );
         void hideSpritesms( );
         void hideSpriteCall( );
+        void hideSpriteBT( );
         void hideString( );
         void updateScreenSprite( );
         
@@ -68,6 +71,10 @@ class DGeniusCanvas : public QCanvas
             Lockimg_array->setImage(0,Lock_img);
             Call_sprite = new QCanvasSprite(Lockimg_array,this);
 
+            Lock_img = new QCanvasPixmap(bluetooth_xpm,QPoint(-22,-175));
+            Lockimg_array = new QCanvasPixmapArray( );
+            Lockimg_array->setImage(0,Lock_img);
+            BT_sprite = new QCanvasSprite(Lockimg_array,this);
             //setup time array
             updateScreenSprite( );
 	//setup background color

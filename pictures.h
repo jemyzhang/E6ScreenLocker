@@ -2215,6 +2215,40 @@ static const char *logo_xpm[] = {
 "jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj"
 };
 
+/* XPM */
+static const char *bluetooth_xpm[] = {
+/* width height num_colors chars_per_pixel */
+"    13    18        8            1",
+/* colors */
+"` c #0000ff",
+". c #9399c3",
+"# c #464da6",
+"a c #2831af",
+"b c #d4dae0",
+"c c #666eb1",
+"d c #aeb6d1",
+"e c #ffffff",
+/* pixels */
+"eeebcccccbeee",
+"eeca``````#ee",
+"e#```c#````ae",
+"b````.ba````.",
+"a````.eba```a",
+"a`..`.ddba```",
+"a`de...abba``",
+"a`adee.ce.```",
+"a``adebbc````",
+"a```#eeb`````",
+"a``abeee.````",
+"a`abebd.e.```",
+"a`be#..abea``",
+"a`cc`..cec```",
+".````.ebc```#",
+"b````.ec````d",
+"ed```.c````.e",
+"eebc`aa``#dee"
+};
+
 static const char **Cdigi_xpm[] = { C0_xpm, C1_xpm, C2_xpm, C3_xpm, C4_xpm, C5_xpm, C6_xpm, C7_xpm, C8_xpm, C9_xpm };
 static const char **Ddigi_xpm[] = { D0_xpm, D1_xpm, D2_xpm, D3_xpm, D4_xpm, D5_xpm, D6_xpm, D7_xpm, D8_xpm, D9_xpm };
 static const char **Day_xpm[] = { Sun_xpm, Mon_xpm, Tue_xpm, Wen_xpm, Thu_xpm, Fri_xpm, Sat_xpm };
@@ -2254,15 +2288,3 @@ static const char **static_screen_xpm[] = {
 	logo_xpm,Ccolon_xpm,Dhori_xpm,Dhori_xpm,
 };
 
-static const char *Cdigi_array[] = { 
-"image/C0.xpm",
-"image/C1.xpm",
-"image/C2.xpm",
-"image/C3.xpm",
-"image/C4.xpm",
-"image/C5.xpm",
-"image/C6.xpm",
-"image/C7.xpm",
-"image/C8.xpm",
-"image/C9.xpm",
-};

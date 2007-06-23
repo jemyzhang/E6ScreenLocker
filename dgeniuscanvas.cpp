@@ -20,7 +20,6 @@ void DGeniusCanvas :: init( )
             QCanvasSprite *static_Screen_sprite = new QCanvasSprite(imgarray,this);
             static_Screen_sprite->show();
         }
-
 }
 
 void DGeniusCanvas :: get_time_ch( )
@@ -83,6 +82,16 @@ void DGeniusCanvas :: showSpriteCall( )
 void DGeniusCanvas :: hideSpriteCall( )
 {
     Call_sprite->hide( );
+}
+
+void DGeniusCanvas :: showSpriteBT()
+{
+    BT_sprite->show();
+}
+
+void DGeniusCanvas :: hideSpriteBT()
+{
+    BT_sprite->hide();
 }
 
 void DGeniusCanvas :: updateScreenSprite( )
