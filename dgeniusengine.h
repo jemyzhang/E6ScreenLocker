@@ -28,6 +28,9 @@ class DGeniusEngine : public QThread, PointerListener
         void hideScreenSaver();
         void backlightctrl(bool onoff);
         int backlightstatus( );
+        void iconcheckBT();
+        void iconcheckNoti();
+        void incomecheck();
 
     public:
         DGeniusEngine( DGeniusCanvas *canvas_ )

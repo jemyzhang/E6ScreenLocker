@@ -13,48 +13,29 @@
 
 extern "C" int  UTIL_GetNotificationStatus();
 extern "C" int  UTIL_GetBtStatus();
+extern "C" int  UTIL_GetIncomingCallStatus();
+extern "C" int  UTIL_GetCallConnectedStatus(void);  
 
 void DGeniusEngine :: run( )
 {
-    static bool fnotification = false;
-    static bool btstatus = false;
 
     canvas->update( );
     if(false == backlightstatus()) backlightctrl(true);
     while(1)
     {
         sleep(1);
-        bool bt_ = UTIL_GetBtStatus();
-        if(btstatus != bt_){
-            btstatus = bt_;
-            if (btstatus) {
-                canvas->showSpriteBT();
-            }else
-            {
-                canvas->hideSpriteBT ();
-            }
-        }
-        bool fnotifi = UTIL_GetNotificationStatus();
-        if(fnotification != fnotifi)
-        {
-            printf("Notification status: %d\n",fnotifi);
-            fnotification = fnotifi;
-            if(fnotification)
-            {
-                canvas->showSpritesms();
-                canvas->showSpriteCall();
-            }else
-            {
-                canvas->hideSpritesms();
-                canvas->hideSpriteCall();
-            }
-            canvas->update();
-        }
 
         struct tm *tm_ptr;
         time_t now;
         time(&now); 
         tm_ptr = localtime(&now);
+
+        incomecheck(); // hide canvas while incoming call and show canvas after incoming call
+
+        if (!ishide) {
+            iconcheckBT();
+            iconcheckNoti();
+        }
 
         if (!ishide && !(view->isActiveWindow()) ) {    //check if screensaver is forced background
             showScreenSaver();
@@ -234,4 +215,60 @@ int DGeniusEngine :: backlightstatus( )
     close(fbd);
     printf("Backlight status %d\n",status);
     return status;
+}
+
+void DGeniusEngine :: iconcheckBT( )
+{
+    static bool btstatus = false;
+    bool bt_ = UTIL_GetBtStatus();
+    if(btstatus != bt_){
+        btstatus = bt_;
+        if (btstatus) {
+            canvas->showSpriteBT();
+        }else
+        {
+            canvas->hideSpriteBT ();
+        }
+        canvas->update();
+    }
+}
+
+void DGeniusEngine :: iconcheckNoti( )
+{
+    static bool fnotification = false;
+    bool fnotifi = UTIL_GetNotificationStatus();
+    if(fnotification != fnotifi)
+    {
+        printf("Notification status: %d\n",fnotifi);
+        fnotification = fnotifi;
+        if(fnotification)
+        {
+            canvas->showSpritesms();
+            canvas->showSpriteCall();
+        }else
+        {
+            canvas->hideSpritesms();
+            canvas->hideSpriteCall();
+        }
+        canvas->update();
+    }
+}
+
+void DGeniusEngine :: incomecheck( )
+{
+    static bool fincomecall = false;
+    bool incall_ = UTIL_GetIncomingCallStatus();
+    bool calling = UTIL_GetCallConnectedStatus();
+
+    if (incall_ &&  !ishide) {
+        if(!backlightstatus()) backlightctrl(true);
+        timeout = 0;
+        hideScreenSaver();
+        fincomecall = incall_;
+    }
+    if (fincomecall && !incall_ && ishide && !calling) {
+        if(backlightstatus()) backlightctrl(false);
+        showScreenSaver();
+        fincomecall = incall_;
+    }
 }
