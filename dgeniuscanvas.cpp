@@ -13,13 +13,6 @@ void DGeniusCanvas :: init( )
             Screen_sprite[i] = NULL;
             digi_backup[i] = 0xff;
         }
-        for( int i = 0; i < 4; i++) {
-            QCanvasPixmap *img = new QCanvasPixmap(static_screen_xpm[i],QPoint(static_screen_pos[i].x , static_screen_pos[i].y));
-            QCanvasPixmapArray *imgarray = new QCanvasPixmapArray( );
-            imgarray->setImage(0,img);
-            QCanvasSprite *static_Screen_sprite = new QCanvasSprite(imgarray,this);
-            static_Screen_sprite->show();
-        }
 }
 
 void DGeniusCanvas :: get_time_ch( )
@@ -52,6 +45,22 @@ void DGeniusCanvas :: get_time_ch( )
     digi_buf[10] = tmp % 10;
     digi_buf[11] = tm_ptr->tm_wday;
     printf("Ready for output date %s\n",ctime(&now));
+}
+
+void DGeniusCanvas :: loadBGimg( )
+{   
+    bg_img = new QCanvasPixmap(QPixmap("screenlock.bg"),QPoint(0,0));
+    if(bg_img->isNull())
+    {
+        delete bg_img;
+    }else
+    {
+        printf("Loading background img..\n");
+        bgimg_array = new QCanvasPixmapArray( );
+        bgimg_array->setImage(0,bg_img);
+        BG_sprite = new QCanvasSprite(bgimg_array,this);
+        BG_sprite->show();
+    }
 }
 
 void DGeniusCanvas :: showSpriteLock( )
@@ -122,11 +131,13 @@ void DGeniusCanvas :: updateScreenSprite( )
                 removeItem(Screen_sprite[i]);
                 delete Screen_sprite[i];
                 Screen_sprite[i] = NULL;
+                delete img[i];
+                img[i] = NULL;
                 }
-            QCanvasPixmap *img = new QCanvasPixmap((const char**)screen_xpm[i],QPoint(screen_pos[i].x , screen_pos[i].y));
-            QCanvasPixmapArray *imgarray = new QCanvasPixmapArray( );
-            imgarray->setImage(0,img);
-            Screen_sprite[i] = new QCanvasSprite(imgarray,this);
+            img[i] = new QCanvasPixmap((const char**)screen_xpm[i],QPoint(screen_pos[i].x , screen_pos[i].y));
+            imgarray[i] = QCanvasPixmapArray( );
+            imgarray[i].setImage(0,img[i]);
+            Screen_sprite[i] = new QCanvasSprite(&imgarray[i],this);
             Screen_sprite[i]->show();
             digi_backup[i] = digi_buf[i];
             }

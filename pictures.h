@@ -915,7 +915,7 @@ static const char *Dhori_xpm[] = {
 /* width height num_colors chars_per_pixel */
 "     8    11      256            2",
 /* colors */
-"`` c #ffffff",
+"`` c none",
 "`. c #cdcecd",
 "`# c #bdbebd",
 "`a c #dedede",
@@ -2227,7 +2227,7 @@ static const char *bluetooth_xpm[] = {
 "b c #d4dae0",
 "c c #666eb1",
 "d c #aeb6d1",
-"e c #ffffff",
+"e c none",
 /* pixels */
 "eeebcccccbeee",
 "eeca``````#ee",

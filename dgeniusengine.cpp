@@ -106,10 +106,16 @@ void DGeniusEngine :: pointerReleased( int x, int y )
 
 void DGeniusEngine :: keyPressed(int keycode)
 {
-    keypressed = true ;
-    timeout = 0;
-    if(false == backlightstatus()) backlightctrl(true);
     if (false == ishide) {
+        keypressed = true ;
+        timeout = 0;
+        if(false == backlightstatus()) {
+            iconcheckBT();
+            iconcheckNoti();
+            canvas->updateScreenSprite();
+            canvas->update();
+            backlightctrl(true);
+        }
         if(4144 == keycode)
         {
             hidepressed = true ;
@@ -257,18 +263,24 @@ void DGeniusEngine :: iconcheckNoti( )
 void DGeniusEngine :: incomecheck( )
 {
     static bool fincomecall = false;
+    static bool checktwice = false;
     bool incall_ = UTIL_GetIncomingCallStatus();
-    bool calling = UTIL_GetCallConnectedStatus();
-
     if (incall_ &&  !ishide) {
+        hideScreenSaver();
         if(!backlightstatus()) backlightctrl(true);
         timeout = 0;
-        hideScreenSaver();
         fincomecall = incall_;
-    }
-    if (fincomecall && !incall_ && ishide && !calling) {
-        if(backlightstatus()) backlightctrl(false);
-        showScreenSaver();
-        fincomecall = incall_;
+    }else if (fincomecall && !incall_ && ishide && !UTIL_GetCallConnectedStatus()) {
+        if( checktwice)
+        {
+            showScreenSaver();
+            if(backlightstatus()) backlightctrl(false);
+            fincomecall = incall_;
+            checktwice = false ;
+        }else
+        {
+            printf("Call Connection,check again................\n");
+            checktwice = true ;
+        }
     }
 }
