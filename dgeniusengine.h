@@ -31,6 +31,7 @@ class DGeniusEngine : public QThread, PointerListener
         void iconcheckBT();
         void iconcheckNoti();
         void incomecheck();
+        void autolock(bool sw); //screen auto lock
 
     public:
         DGeniusEngine( DGeniusCanvas *canvas_ )

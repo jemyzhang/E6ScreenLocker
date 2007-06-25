@@ -71,7 +71,7 @@ class DApplication : public ZApplication {
                     if (mouse==0)
                         return false;
                         pointerListener->mousePressed();
-/*                    x=mouse->simpleData.x_root;
+                    x=mouse->simpleData.x_root;
                      y=mouse->simpleData.y_root;
                      z=mouse->simpleData.state;
                      
@@ -90,7 +90,7 @@ class DApplication : public ZApplication {
                         
                         press = z;
                      }
- */               break;
+                break;
                  
                 case QWSEvent::Focus:
 /*                    focus=(QWSFocusEvent*)event;

@@ -74,8 +74,8 @@ void DGeniusEngine :: run( )
         }
         if( true == keypressed)
         {
-            timecnt ++;
-            if ( (timecnt % 2 ) ==0 ){
+            if ( timecnt > 1 ){
+                timecnt = 0;
                 hidepressed = false;
                 showpressed = false;
                 keypressed = false;
@@ -83,31 +83,38 @@ void DGeniusEngine :: run( )
                 canvas->hideSpriteLock();
                 canvas->update();
             }
+            timecnt ++;
         }
-        
+        autolock(true);        
     }
 }
 
 void DGeniusEngine :: pointerPressed( int x, int y )
 {
     std::cout << "Pointer pressed on " << x << "," << y << std::endl;
+    if( x > 220 && y < 10 )
+    {
+        DApplication :: exit();
+        ::exit( 0 );
+    }
     
 }
 
 void DGeniusEngine :: pointerDragged( int x, int y )
 {
-    std::cout << "Pointer dragged on " << x << "," << y << std::endl;
+    //std::cout << "Pointer dragged on " << x << "," << y << std::endl;
 }
 
 void DGeniusEngine :: pointerReleased( int x, int y )
 {
-    std::cout << "Pointer released on " << x << "," << y << std::endl;
+    //std::cout << "Pointer released on " << x << "," << y << std::endl;
 }
 
 void DGeniusEngine :: keyPressed(int keycode)
 {
+    keypressed = true ;
+    timecnt = 0;
     if (false == ishide) {
-        keypressed = true ;
         timeout = 0;
         if(false == backlightstatus()) {
             iconcheckBT();
@@ -116,7 +123,7 @@ void DGeniusEngine :: keyPressed(int keycode)
             canvas->update();
             backlightctrl(true);
         }
-        if(4144 == keycode)
+        if(4145 == keycode)
         {
             hidepressed = true ;
             canvas->showString("\n  Unlock: Now Press Center Key.");
@@ -124,23 +131,22 @@ void DGeniusEngine :: keyPressed(int keycode)
             canvas->update();
         }else if( 4100 == keycode && true == hidepressed )
         {
-            hidepressed = true ;
+            hidepressed = false ;
             canvas->hideString();
             canvas->hideSpriteLock();
            hideScreenSaver();
-           ishide = true;
         }else
         {
             hidepressed = false;
-            canvas->showString("\n  Unlock: First Press Green Key, \n   Then Press Center Key.");
+            canvas->showString("\n  Unlock: First Press Red Key, \n   Then Press Center Key.");
             canvas->showSpriteLock();
             canvas->update();
         }
     }else
     {
-        if (4171 == keycode) {
-            showpressed = ~showpressed;
-        }else if(4172 == keycode && true == showpressed)
+        if (4145 == keycode) {
+            showpressed = true;
+        }else if(4100 == keycode && true == showpressed)
         {
             showpressed = false;
             canvas->updateScreenSprite( );
@@ -282,5 +288,16 @@ void DGeniusEngine :: incomecheck( )
             printf("Call Connection,check again................\n");
             checktwice = true ;
         }
+    }
+}
+
+void DGeniusEngine :: autolock(bool sw)
+{
+    if (sw && ishide && !backlightstatus()) {
+//        if (!UTIL_GetCallConnectedStatus() && ! UTIL_GetIncomingCallStatus()) 
+//        {
+            printf("Screen is autolocked...\n");
+            showScreenSaver();
+//        }
     }
 }
