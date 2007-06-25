@@ -15,6 +15,10 @@ extern "C" int  UTIL_GetNotificationStatus();
 extern "C" int  UTIL_GetBtStatus();
 extern "C" int  UTIL_GetIncomingCallStatus();
 extern "C" int  UTIL_GetCallConnectedStatus(void);  
+extern "C" int  UTIL_GetTimingPhoneLock();
+extern "C" int PM_setupLcdSleepTime(int sleepseconds);
+extern "C" int PM_setupKeylightSleepTime(int sleepseconds);
+extern "C" int PM_setupBklightSleepTime(int sleepseconds);
 
 void DGeniusEngine :: run( )
 {
@@ -23,8 +27,6 @@ void DGeniusEngine :: run( )
     if(false == backlightstatus()) backlightctrl(true);
     while(1)
     {
-        sleep(1);
-
         struct tm *tm_ptr;
         time_t now;
         time(&now); 
@@ -38,12 +40,15 @@ void DGeniusEngine :: run( )
         }
 
         if (!ishide && !(view->isActiveWindow()) ) {    //check if screensaver is forced background
-            showScreenSaver();
+//            showScreenSaver();
+            view->showFullScreen();
+            view->show();
             printf("force active:%d\n",view->isActiveWindow());
         }else if( ishide && view->isActiveWindow() )
         {
             printf("force inactive\n");
-            hideScreenSaver();
+//            hideScreenSaver();
+            view->showMinimized();
         }
 
         if (ishide) {
@@ -60,18 +65,25 @@ void DGeniusEngine :: run( )
         }else
         {
             //timeout = 0;
-            timeout ++;
-            if(timeout > 3){
-                timeout = 0;
-                if(true == backlightstatus()) backlightctrl(false);
+            bool lighton = false;;
+            
+            if(true == backlightstatus()){
+                timeout ++;
+                if(timeout > 3) {
+                    timeout = 0;
+                    backlightctrl(false);
+                }else
+                {
+                    lighton = true;
+                }
+            }
+            if( true == lighton &&  tm_ptr->tm_sec == 0 )
+            {
+               canvas->updateScreenSprite( );
+               canvas->update();
             }
         }
 
-        if( tm_ptr->tm_sec == 0 && false == ishide)
-        {
-           canvas->updateScreenSprite( );
-           canvas->update();
-        }
         if( true == keypressed)
         {
             if ( timecnt > 1 ){
@@ -85,7 +97,8 @@ void DGeniusEngine :: run( )
             }
             timecnt ++;
         }
-        autolock(true);        
+        autolock( );        
+        sleep(1);
     }
 }
 
@@ -112,6 +125,8 @@ void DGeniusEngine :: pointerReleased( int x, int y )
 
 void DGeniusEngine :: keyPressed(int keycode)
 {
+    QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
+
     keypressed = true ;
     timecnt = 0;
     if (false == ishide) {
@@ -126,7 +141,11 @@ void DGeniusEngine :: keyPressed(int keycode)
         if(4145 == keycode)
         {
             hidepressed = true ;
+            #if 0
             canvas->showString("\n  Unlock: Now Press Center Key.");
+            #else
+            canvas->showString(utf8->toUnicode("\n         解锁:请再按圆形确认键."));
+            #endif
             canvas->showSpriteLock();
             canvas->update();
         }else if( 4100 == keycode && true == hidepressed )
@@ -138,7 +157,11 @@ void DGeniusEngine :: keyPressed(int keycode)
         }else
         {
             hidepressed = false;
-            canvas->showString("\n  Unlock: First Press Red Key, \n   Then Press Center Key.");
+            #if 0
+            canvas->showString("\n  Unlock: First Press Hangup Key, \n   Then Press Center Key.");
+            #else
+            canvas->showString(utf8->toUnicode("\n         解锁:请先按挂机键,\n               再按圆形确认键."));
+            #endif
             canvas->showSpriteLock();
             canvas->update();
         }
@@ -184,6 +207,7 @@ void DGeniusEngine :: showScreenSaver()
     view->showFullScreen();
     view->show();
     ishide = false;
+    PM_setupLcdSleepTime(0);
 }
 
 void DGeniusEngine :: hideScreenSaver()
@@ -191,21 +215,38 @@ void DGeniusEngine :: hideScreenSaver()
     printf("canvas Minimized\n");
     view->showMinimized();
     ishide = true;
+    PM_setupLcdSleepTime(30);
 }
 
 void DGeniusEngine :: backlightctrl(bool onoff)
 {
+    int sleeptime = 0;
+//    int keylighttime = 0;
+    if (onoff) {
+        sleeptime = 60;
+        //keylighttime = 10;
+    }
+
+//    PM_setupLcdSleepTime(sleeptime);
+//    PM_setupKeylightSleepTime(keylighttime);
+
     int fbd = open("/dev/fb0", O_RDWR);
     if(fbd<0){
     printf("can not open fb0\n");
     return;
     }
- 
-    ioctl(fbd,FBIOBLANK,0);
-    ioctl(fbd,FBIOSETBKLIGHT,onoff);
-
+    if(onoff){
+        ioctl(fbd,FBIOBLANK,0);
+        ioctl(fbd,FBIOSETBRIGHTNESS,0x19);
+        ioctl(fbd,FBIOSETBKLIGHT,onoff);
+    }else{
+        ioctl(fbd,FBIOSETBRIGHTNESS,0);
+        ioctl(fbd,FBIOSETBKLIGHT,onoff);
+        ioctl(fbd,FBIOBLANK,0x3);
+    }
     close(fbd);
-    printf("Set backlight %s\n",onoff == true ?  "ON" : "OFF");
+
+    printf("Set backlight %s[%d]\n",onoff == true ?  "ON" : "OFF",sleeptime);
 }
 
 int DGeniusEngine :: backlightstatus( )
@@ -218,7 +259,7 @@ int DGeniusEngine :: backlightstatus( )
     return false ;
     }
  
-    ioctl(fbd,FBIOBLANK,0);
+    //ioctl(fbd,FBIOBLANK,0);
     if(ioctl(fbd,FBIOGETBKLIGHT,&status) < 0)
     {
         printf("backlight status : get status error\n");
@@ -291,13 +332,28 @@ void DGeniusEngine :: incomecheck( )
     }
 }
 
-void DGeniusEngine :: autolock(bool sw)
+void DGeniusEngine :: setAutolockInterval(int interval)
 {
-    if (sw && ishide && !backlightstatus()) {
-//        if (!UTIL_GetCallConnectedStatus() && ! UTIL_GetIncomingCallStatus()) 
-//        {
+    autolock_interval = interval;
+    printf("Set autolock interval: %d\n",interval);
+}
+
+void DGeniusEngine :: autolock( )
+{
+    if (0 == autolock_interval || !ishide) {   //if autolock_interval equals 0, then autolock is disabled
+        return;
+    }
+    static int cnt = 0;
+    if (UTIL_GetTimingPhoneLock()) {
+        cnt = 0;
+    }else
+    {
+        cnt ++;
+    }
+    if (cnt > autolock_interval) {
             printf("Screen is autolocked...\n");
+            cnt = 0;
             showScreenSaver();
-//        }
+            backlightctrl(false);
     }
 }

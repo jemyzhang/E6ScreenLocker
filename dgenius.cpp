@@ -10,7 +10,7 @@
 
 int main( int argc, char **argv )
 {
-    printf("ScreenLocker ver.1.0beta(20070625-01.1) by Jemyzhang\n");
+    printf("ScreenLocker ver.1.0beta(20070625-02.16) by Jemyzhang\n");
     DApplication app( argc, argv );
     DGeniusCanvas *canvas = new DGeniusCanvas( 236, 316 );
     QCanvasView *view = new QCanvasView( canvas );
@@ -19,6 +19,12 @@ int main( int argc, char **argv )
     view->show( );
     //app.setMainWidget( view );
     engine->setview(view);
+    if(argc > 1){
+        engine->setAutolockInterval(atoi(argv[1]));
+    }else
+    {
+        engine->setAutolockInterval(30);    //default 30s auto lock
+    }
     engine->start( );
     app.setPointerListener( (PointerListener*) engine );
 

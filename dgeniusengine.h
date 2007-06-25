@@ -24,14 +24,15 @@ class DGeniusEngine : public QThread, PointerListener
         bool ishide;
         unsigned char timecnt;
         unsigned char timeout;
-        void showScreenSaver();
-        void hideScreenSaver();
+        int autolock_interval;
+        void showScreenSaver( );
+        void hideScreenSaver( );
         void backlightctrl(bool onoff);
         int backlightstatus( );
-        void iconcheckBT();
-        void iconcheckNoti();
-        void incomecheck();
-        void autolock(bool sw); //screen auto lock
+        void iconcheckBT( );
+        void iconcheckNoti( );
+        void incomecheck( );
+        void autolock( ); //screen auto lock
 
     public:
         DGeniusEngine( DGeniusCanvas *canvas_ )
@@ -52,6 +53,7 @@ class DGeniusEngine : public QThread, PointerListener
         void keyPressed(int keycode);
         void QcopAutoLock( );
         void mousePressed( );
+        void setAutolockInterval(int interval);
 };
 
 
