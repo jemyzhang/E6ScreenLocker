@@ -29,9 +29,8 @@ class PointerListener
         virtual void pointerPressed( int x, int y) = 0;
         virtual void pointerDragged( int x, int y) = 0;
         virtual void pointerReleased( int x, int y) = 0;
-        virtual void QcopAutoLock( ) = 0;
-        virtual void mousePressed( ) = 0;
         virtual void keyPressed(int keycode) = 0;
+        virtual void QCopReceived(int message) = 0;
 };
 
 class DApplication : public ZApplication {
@@ -45,15 +44,18 @@ class DApplication : public ZApplication {
         {
             pointerListener = 0;
         }
-        virtual ~DApplication() {}
+        virtual ~DApplication() {printf("exit application\n");}
         void insertStr(QWSEvent*) {}
         virtual bool qwsEventFilter(QWSEvent* event) {
             ZApplication::qwsEventFilter(event);
             QWSMouseEvent* mouse=0;
             QWSKeyEvent* KeyEvent =0;
             QWSFocusEvent* focus;
+            QWSQCopMessageEvent *QCop;
             QWSPropertyNotifyEvent *propertyNotify;
+            
             int x,y,z;
+            int kcode;
             if (!event)
                 return false;
                 
@@ -70,8 +72,7 @@ class DApplication : public ZApplication {
                     mouse=event->asMouse();
                     if (mouse==0)
                         return false;
-                        pointerListener->mousePressed();
-                    x=mouse->simpleData.x_root;
+                     x=mouse->simpleData.x_root;
                      y=mouse->simpleData.y_root;
                      z=mouse->simpleData.state;
                      
@@ -112,11 +113,15 @@ class DApplication : public ZApplication {
                     KeyEvent = (QWSKeyEvent*) event;
                     if (KeyEvent==0)
                         return 0;
-                        
                     printf("key %d %d %d\n",
                         KeyEvent->simpleData.keycode,
                         KeyEvent->simpleData.is_press,
                         KeyEvent->simpleData.is_auto_repeat);
+                    kcode = KeyEvent->simpleData.keycode;
+                    if(kcode == 4118 || kcode == 4119 || kcode == 4169 || kcode == 4171 || kcode == 4172) {
+                        //
+                    }
+
                     if (KeyEvent->simpleData.is_press && !KeyEvent->simpleData.is_auto_repeat) {
                         pointerListener->keyPressed(KeyEvent->simpleData.keycode);
                     }
@@ -162,8 +167,15 @@ class DApplication : public ZApplication {
                 break;
                 
                 case QWSEvent::QCopMessage:
-                    printf("QCopMessage\n");
-                    pointerListener->QcopAutoLock();
+                    QCop = (QWSQCopMessageEvent *)event;
+                    printf("QCopMessage %d %d %d\n",
+                        QCop->simpleData.lchannel,
+                        QCop->simpleData.ldata,
+                        QCop->simpleData.lmessage);
+                    pointerListener->QCopReceived(QCop->simpleData.lmessage);
+                    if(QCop->simpleData.lmessage == 6) {
+                        return true;
+                    }
                 break;
                 
                 case QWSEvent::WindowOperation:

@@ -140,7 +140,9 @@ void DGeniusCanvas :: updateScreenSprite( )
             Screen_sprite[i] = new QCanvasSprite(&imgarray[i],this);
             Screen_sprite[i]->show();
             digi_backup[i] = digi_buf[i];
-            }
+            }else{
+                Screen_sprite[i]->show();
+            }            
     }
     printf("canvas updated\n");
 }

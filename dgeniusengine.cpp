@@ -16,15 +16,17 @@ extern "C" int  UTIL_GetBtStatus();
 extern "C" int  UTIL_GetIncomingCallStatus();
 extern "C" int  UTIL_GetCallConnectedStatus(void);  
 extern "C" int  UTIL_GetTimingPhoneLock();
+
 extern "C" int PM_setupLcdSleepTime(int sleepseconds);
-extern "C" int PM_setupKeylightSleepTime(int sleepseconds);
-extern "C" int PM_setupBklightSleepTime(int sleepseconds);
+
+
+QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
 
 void DGeniusEngine :: run( )
 {
-
-    canvas->update( );
-    if(false == backlightstatus()) backlightctrl(true);
+    PM_setupLcdSleepTime(0);
+    ishide = false;
+    showScreenSaver();
     while(1)
     {
         struct tm *tm_ptr;
@@ -32,55 +34,24 @@ void DGeniusEngine :: run( )
         time(&now); 
         tm_ptr = localtime(&now);
 
-        incomecheck(); // hide canvas while incoming call and show canvas after incoming call
-
-        if (!ishide) {
-            iconcheckBT();
-            iconcheckNoti();
-        }
-
         if (!ishide && !(view->isActiveWindow()) ) {    //check if screensaver is forced background
-//            showScreenSaver();
-            view->showFullScreen();
             view->show();
+            view->setActiveWindow();
             printf("force active:%d\n",view->isActiveWindow());
         }else if( ishide && view->isActiveWindow() )
         {
             printf("force inactive\n");
-//            hideScreenSaver();
-            view->showMinimized();
+            view->hide();
         }
 
         if (ishide) {
-//            timeout ++;   //disable auto screen lock, can not receive mouse event while minimized
             timeout = 0;    //for backlight timeout
-            //check timeout
-            if (timeout > 5 ) {
-                printf("timeout,auto lock\n");
-                timeout = 0;
-                canvas->updateScreenSprite( );
-                canvas->update();
-                showScreenSaver();
-                }
         }else
         {
-            //timeout = 0;
-            bool lighton = false;;
-            
-            if(true == backlightstatus()){
-                timeout ++;
-                if(timeout > 3) {
-                    timeout = 0;
-                    backlightctrl(false);
-                }else
-                {
-                    lighton = true;
-                }
-            }
-            if( true == lighton &&  tm_ptr->tm_sec == 0 )
-            {
-               canvas->updateScreenSprite( );
-               canvas->update();
+            timeout ++;
+            if(timeout > 3) {
+                timeout = 0;
+                if(true == backlightstatus()) backlightctrl(false);
             }
         }
 
@@ -98,8 +69,16 @@ void DGeniusEngine :: run( )
             timecnt ++;
         }
         autolock( );        
+        incomecheck(); // hide canvas while incoming call and show canvas after incoming call
         sleep(1);
     }
+}
+
+void DGeniusEngine :: QCopReceived(int message)
+{
+//    if (message == 6) {
+//        backlightctrl(false);
+//    }
 }
 
 void DGeniusEngine :: pointerPressed( int x, int y )
@@ -107,6 +86,7 @@ void DGeniusEngine :: pointerPressed( int x, int y )
     std::cout << "Pointer pressed on " << x << "," << y << std::endl;
     if( x > 220 && y < 10 )
     {
+        PM_setupLcdSleepTime(30);
         DApplication :: exit();
         ::exit( 0 );
     }
@@ -125,42 +105,33 @@ void DGeniusEngine :: pointerReleased( int x, int y )
 
 void DGeniusEngine :: keyPressed(int keycode)
 {
-    QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
 
     keypressed = true ;
     timecnt = 0;
     if (false == ishide) {
         timeout = 0;
-        if(false == backlightstatus()) {
-            iconcheckBT();
-            iconcheckNoti();
-            canvas->updateScreenSprite();
-            canvas->update();
-            backlightctrl(true);
-        }
+        showScreenSaver();
         if(4145 == keycode)
         {
             hidepressed = true ;
             #if 0
-            canvas->showString("\n  Unlock: Now Press Center Key.");
+            canvas->showString("\n  Unlock: Now Press Left Key.");
             #else
-            canvas->showString(utf8->toUnicode("\n         解锁:请再按圆形确认键."));
+            canvas->showString(utf8->toUnicode("\n         解锁:请再按左方向键."));
             #endif
             canvas->showSpriteLock();
             canvas->update();
-        }else if( 4100 == keycode && true == hidepressed )
+        }else if( 4116 == keycode && true == hidepressed )
         {
             hidepressed = false ;
-            canvas->hideString();
-            canvas->hideSpriteLock();
-           hideScreenSaver();
+            hideScreenSaver();
         }else
         {
             hidepressed = false;
             #if 0
-            canvas->showString("\n  Unlock: First Press Hangup Key, \n   Then Press Center Key.");
+            canvas->showString("\n  Unlock: First Press Hangup Key, \n   Then Press Left Key.");
             #else
-            canvas->showString(utf8->toUnicode("\n         解锁:请先按挂机键,\n               再按圆形确认键."));
+            canvas->showString(utf8->toUnicode("\n         解锁:请先按挂机键,\n               再按左方向键."));
             #endif
             canvas->showSpriteLock();
             canvas->update();
@@ -169,11 +140,9 @@ void DGeniusEngine :: keyPressed(int keycode)
     {
         if (4145 == keycode) {
             showpressed = true;
-        }else if(4100 == keycode && true == showpressed)
+        }else if(4116 == keycode && true == showpressed)
         {
             showpressed = false;
-            canvas->updateScreenSprite( );
-            canvas->update();
             showScreenSaver();
         }else
         {
@@ -182,32 +151,26 @@ void DGeniusEngine :: keyPressed(int keycode)
     }
 }
 
-void DGeniusEngine :: mousePressed( )
-{
-   // if (false == ishide && false == backlightstatus()) {
-        //backlightctrl(false);
-    //}
-}
-
-void DGeniusEngine :: QcopAutoLock( )
-{
-    if (ishide) {
-        //showScreenSaver();
-    }
-}
-
-void DGeniusEngine :: setview(QCanvasView *canvasview)
+void DGeniusEngine :: setview(QCanvasView *canvasview,DApplication *app)
 {
     view = canvasview;
+    DApp = app;
 }
 
 void DGeniusEngine :: showScreenSaver()
 {
     printf("canvas show\n");
-    view->showFullScreen();
-    view->show();
-    ishide = false;
-    PM_setupLcdSleepTime(0);
+
+    iconcheckBT();
+    iconcheckNoti();
+    canvas->updateScreenSprite( );
+    canvas->update();
+    if (ishide) {
+        view->showFullScreen();
+        view->show();
+        ishide = false;
+    }
+    if(false == backlightstatus()) backlightctrl(true);
 }
 
 void DGeniusEngine :: hideScreenSaver()
@@ -215,21 +178,10 @@ void DGeniusEngine :: hideScreenSaver()
     printf("canvas Minimized\n");
     view->showMinimized();
     ishide = true;
-    PM_setupLcdSleepTime(30);
 }
 
 void DGeniusEngine :: backlightctrl(bool onoff)
 {
-    int sleeptime = 0;
-//    int keylighttime = 0;
-    if (onoff) {
-        sleeptime = 60;
-        //keylighttime = 10;
-    }
-
-//    PM_setupLcdSleepTime(sleeptime);
-//    PM_setupKeylightSleepTime(keylighttime);
-
     int fbd = open("/dev/fb0", O_RDWR);
     if(fbd<0){
     printf("can not open fb0\n");
@@ -246,7 +198,25 @@ void DGeniusEngine :: backlightctrl(bool onoff)
     }
     close(fbd);
 
-    printf("Set backlight %s[%d]\n",onoff == true ?  "ON" : "OFF",sleeptime);
+    printf("Set backlight %s\n",onoff == true ?  "ON" : "OFF");
+    keylightctrl(onoff);
+}
+
+void DGeniusEngine :: keylightctrl(bool onoff)
+{
+    int keyd = open("/dev/keylight", O_RDWR);
+    if(keyd<0){
+    printf("can not open keylight device\n");
+    return;
+    }
+    if(onoff){
+        ioctl(keyd,0xf0,0);
+    }else{
+        ioctl(keyd,0xf2,0);
+    }
+    close(keyd);
+
+    printf("Set keylight %s\n",onoff == true ?  "ON" : "OFF");
 }
 
 int DGeniusEngine :: backlightstatus( )
@@ -259,7 +229,6 @@ int DGeniusEngine :: backlightstatus( )
     return false ;
     }
  
-    //ioctl(fbd,FBIOBLANK,0);
     if(ioctl(fbd,FBIOGETBKLIGHT,&status) < 0)
     {
         printf("backlight status : get status error\n");
@@ -282,7 +251,6 @@ void DGeniusEngine :: iconcheckBT( )
         {
             canvas->hideSpriteBT ();
         }
-        canvas->update();
     }
 }
 
@@ -303,7 +271,6 @@ void DGeniusEngine :: iconcheckNoti( )
             canvas->hideSpritesms();
             canvas->hideSpriteCall();
         }
-        canvas->update();
     }
 }
 
@@ -313,6 +280,7 @@ void DGeniusEngine :: incomecheck( )
     static bool checktwice = false;
     bool incall_ = UTIL_GetIncomingCallStatus();
     if (incall_ &&  !ishide) {
+        printf("Incoming Call, canvas hide...\n");
         hideScreenSaver();
         if(!backlightstatus()) backlightctrl(true);
         timeout = 0;
@@ -321,14 +289,17 @@ void DGeniusEngine :: incomecheck( )
         if( checktwice)
         {
             showScreenSaver();
-            if(backlightstatus()) backlightctrl(false);
             fincomecall = incall_;
             checktwice = false ;
         }else
         {
-            printf("Call Connection,check again................\n");
+            printf("Call rejected or missed, check again................\n");
             checktwice = true ;
         }
+    }else if (fincomecall && !incall_ && ishide && UTIL_GetCallConnectedStatus())
+    {
+        printf("Call connected...\n");
+        fincomecall = false;    //if the phone is picked up, do not lock the phone after hangup
     }
 }
 
@@ -344,7 +315,7 @@ void DGeniusEngine :: autolock( )
         return;
     }
     static int cnt = 0;
-    if (UTIL_GetTimingPhoneLock()) {
+    if (UTIL_GetTimingPhoneLock() || UTIL_GetCallConnectedStatus()) {   //disable autolock while calling
         cnt = 0;
     }else
     {
@@ -357,3 +328,4 @@ void DGeniusEngine :: autolock( )
             backlightctrl(false);
     }
 }
+

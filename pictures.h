@@ -1,3 +1,5 @@
+#ifndef _PICTURE_H_
+#define _PICTURE_H_
 /* XPM */
 static const char *C0_xpm[] = {
 /* width height num_colors chars_per_pixel */
@@ -2249,6 +2251,32 @@ static const char *bluetooth_xpm[] = {
 "eebc`aa``#dee"
 };
 
+/* XPM */
+static const char *Dot_xpm[] = {
+/* width height num_colors chars_per_pixel */
+"    10    10        8            1",
+/* colors */
+"` c #000000",
+". c #949494",
+"# c #444644",
+"a c #d1cfd1",
+"b c #353335",
+"c c #777677",
+"d c #ffffff",
+"e c #e4e2e4",
+/* pixels */
+"ddd.bbcedd",
+"da``````.d",
+"d````````a",
+"c````````b",
+"#`````````",
+"b`````````",
+"c````````b",
+"e````````.",
+"d.``````#d",
+"ddab``b.dd"
+};
+
 static const char **Cdigi_xpm[] = { C0_xpm, C1_xpm, C2_xpm, C3_xpm, C4_xpm, C5_xpm, C6_xpm, C7_xpm, C8_xpm, C9_xpm };
 static const char **Ddigi_xpm[] = { D0_xpm, D1_xpm, D2_xpm, D3_xpm, D4_xpm, D5_xpm, D6_xpm, D7_xpm, D8_xpm, D9_xpm };
 static const char **Day_xpm[] = { Sun_xpm, Mon_xpm, Tue_xpm, Wen_xpm, Thu_xpm, Fri_xpm, Sat_xpm };
@@ -2268,6 +2296,7 @@ static const QPoint_st static_screen_pos[] ={
 	{-50-33*2,-140},		//Ccolon_xpm
 	{-70-11*2,-180},				//Dhori_xpm
 	{-78-11*4,-180},	//Dhori_xpm
+    {-225,-2},
 };
 static const QPoint_st screen_pos[] ={
 //	dynamic image positons
@@ -2282,9 +2311,10 @@ static const QPoint_st screen_pos[] ={
    {-78-11*3,-180},	//D0_xpm
 	{-86-11*4,-180},	//D0_xpm
 	{-86-11*5,-180},		//D0_xpm
-	{-10,-118},	//Mon_xpm
+	{-15,-118},	//Mon_xpm
 };
 static const char **static_screen_xpm[] = {
-	logo_xpm,Ccolon_xpm,Dhori_xpm,Dhori_xpm,
+	logo_xpm,Ccolon_xpm,Dhori_xpm,Dhori_xpm,Dot_xpm,
 };
+#endif
 

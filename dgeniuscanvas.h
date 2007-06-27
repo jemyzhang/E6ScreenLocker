@@ -58,7 +58,7 @@ class DGeniusCanvas : public QCanvas
             //prepare background image	 
             loadBGimg();
 
-            for( int i = 0; i < 4; i++) {
+            for( int i = 0; i < 5; i++) {
                 QCanvasPixmap *img = new QCanvasPixmap(static_screen_xpm[i],QPoint(static_screen_pos[i].x , static_screen_pos[i].y));
                 QCanvasPixmapArray *imgarray = new QCanvasPixmapArray( );
                 imgarray->setImage(0,img);
@@ -104,11 +104,12 @@ class DGeniusCanvas : public QCanvas
 
         
         virtual ~DGeniusCanvas( ) {
+            printf("delete image source\n");
             delete[] Screen_sprite;
             delete[] img;
             delete bg_img;
             delete bgimg_array;
-            //delete[] imgarray; 
+            printf("delete image source\n");
 				}
 
 };

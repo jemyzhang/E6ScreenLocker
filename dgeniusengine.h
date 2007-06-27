@@ -18,6 +18,7 @@ class DGeniusEngine : public QThread, PointerListener
     private:
         DGeniusCanvas *canvas;
         QCanvasView *view;
+        DApplication *DApp;
         bool keypressed;
         bool hidepressed;
         bool showpressed;
@@ -28,6 +29,7 @@ class DGeniusEngine : public QThread, PointerListener
         void showScreenSaver( );
         void hideScreenSaver( );
         void backlightctrl(bool onoff);
+        void keylightctrl(bool onoff);
         int backlightstatus( );
         void iconcheckBT( );
         void iconcheckNoti( );
@@ -46,16 +48,14 @@ class DGeniusEngine : public QThread, PointerListener
         }
         
         virtual void run( );
-        void setview(QCanvasView *canvasview);
+        void setview(QCanvasView *canvasview,DApplication *app);
         void pointerPressed( int x, int y );
         void pointerDragged( int x, int y );
         void pointerReleased( int x, int y );
         void keyPressed(int keycode);
-        void QcopAutoLock( );
-        void mousePressed( );
         void setAutolockInterval(int interval);
+        void QCopReceived(int message);
 };
-
 
 #endif
 
