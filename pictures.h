@@ -2262,7 +2262,7 @@ static const char *Dot_xpm[] = {
 "a c #d1cfd1",
 "b c #353335",
 "c c #777677",
-"d c #ffffff",
+"d c none",
 "e c #e4e2e4",
 /* pixels */
 "ddd.bbcedd",

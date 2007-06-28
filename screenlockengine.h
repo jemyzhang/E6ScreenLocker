@@ -1,10 +1,10 @@
 
-#ifndef _DGENIUSENGINE_H_
-#define _DGENIUSENGINE_H_
+#ifndef _SCREENLOCKENGINE_H_
+#define _SCREENLOCKENGINE_H_
 
 #include <qthread.h>
 #include "dapplication.h"
-#include "dgeniuscanvas.h"
+#include "screenlockcanvas.h"
 
 /* added for backlight control */
 #define FBIOSETBKLIGHT          0x4619
@@ -13,31 +13,33 @@
 #define FBIOGETBRIGHTNESS       0x461C 
 
 
-class DGeniusEngine : public QThread, PointerListener
+class ScreenLockEngine : public QThread, PointerListener
 {
     private:
-        DGeniusCanvas *canvas;
+        ScreenLockCanvas *canvas;
         QCanvasView *view;
         DApplication *DApp;
         bool keypressed;
         bool hidepressed;
         bool showpressed;
         bool ishide;
+        bool req_update;
         unsigned char timecnt;
         unsigned char timeout;
         int autolock_interval;
+        int sys_brightness;
+        int sys_lcdsleeptime;
         void showScreenSaver( );
         void hideScreenSaver( );
-        void backlightctrl(bool onoff);
+        void backlightctrl(bool onoff,int brightness = 10);
         void keylightctrl(bool onoff);
         int backlightstatus( );
-        void iconcheckBT( );
-        void iconcheckNoti( );
         void incomecheck( );
         void autolock( ); //screen auto lock
+        void getSysDefine( ); //get system defined brightness and lcd sleep time
 
     public:
-        DGeniusEngine( DGeniusCanvas *canvas_ )
+        ScreenLockEngine( ScreenLockCanvas *canvas_ )
         {
             canvas = canvas_;
             keypressed = false;

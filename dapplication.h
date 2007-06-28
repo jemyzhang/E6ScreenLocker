@@ -46,6 +46,7 @@ class DApplication : public ZApplication {
         }
         virtual ~DApplication() {printf("exit application\n");}
         void insertStr(QWSEvent*) {}
+
         virtual bool qwsEventFilter(QWSEvent* event) {
             ZApplication::qwsEventFilter(event);
             QWSMouseEvent* mouse=0;
@@ -94,21 +95,12 @@ class DApplication : public ZApplication {
                 break;
                  
                 case QWSEvent::Focus:
-/*                    focus=(QWSFocusEvent*)event;
-                    if (focus->simpleData.get_focus==0) {
-                    }
-*/                break;
+//                    focus=(QWSFocusEvent*)event;
+//                    if (focus->simpleData.get_focus==0) {
+//                    }
+                break;
                 
                 case QWSEvent::Key:
-                
-                    /*
-                	int window;
-                	ushort unicode;
-                	ushort keycode;
-                	int modifiers;
-                	uint is_press:1;
-                	uint is_auto_repeat:1;
-                	*/
                 
                     KeyEvent = (QWSKeyEvent*) event;
                     if (KeyEvent==0)
@@ -192,7 +184,7 @@ class DApplication : public ZApplication {
            }
            return false;
       }
-      
+     
       void setPointerListener( PointerListener *listener )
       {
         pointerListener = listener;

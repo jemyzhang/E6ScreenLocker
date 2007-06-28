@@ -1,12 +1,15 @@
 
 #include <qcanvas.h>
 #include <stdio.h>
-#include "dgeniuscanvas.h"
+#include "screenlockcanvas.h"
 
 // 2126-8423 - Ricardo
 
+extern "C" int  UTIL_GetNotificationStatus();
+extern "C" int  UTIL_GetBtStatus();
 
-void DGeniusCanvas :: init( )
+
+void ScreenLockCanvas :: init( )
 {
         for( int i = 0; i < 12; i++)
         {
@@ -15,7 +18,7 @@ void DGeniusCanvas :: init( )
         }
 }
 
-void DGeniusCanvas :: get_time_ch( )
+void ScreenLockCanvas :: get_time_ch( )
 {
     struct tm *tm_ptr;
     time_t now;
@@ -47,7 +50,7 @@ void DGeniusCanvas :: get_time_ch( )
     printf("Ready for output date %s\n",ctime(&now));
 }
 
-void DGeniusCanvas :: loadBGimg( )
+void ScreenLockCanvas :: loadBGimg( )
 {   
     bg_img = new QCanvasPixmap(QPixmap("screenlock.bg"),QPoint(0,0));
     if(bg_img->isNull())
@@ -63,47 +66,47 @@ void DGeniusCanvas :: loadBGimg( )
     }
 }
 
-void DGeniusCanvas :: showSpriteLock( )
+void ScreenLockCanvas :: showSpriteLock( )
 {
     Lock_sprite->show( );
 }
 
-void DGeniusCanvas :: hideSpriteLock( )
+void ScreenLockCanvas :: hideSpriteLock( )
 {
     Lock_sprite->hide( );
 }
 
-void DGeniusCanvas :: showSpritesms( )
+void ScreenLockCanvas :: showSpritesms( )
 {
     sms_sprite->show( );
 }
 
-void DGeniusCanvas :: hideSpritesms( )
+void ScreenLockCanvas :: hideSpritesms( )
 {
     sms_sprite->hide( );
 }
 
-void DGeniusCanvas :: showSpriteCall( )
+void ScreenLockCanvas :: showSpriteCall( )
 {
     Call_sprite->show( );
 }
 
-void DGeniusCanvas :: hideSpriteCall( )
+void ScreenLockCanvas :: hideSpriteCall( )
 {
     Call_sprite->hide( );
 }
 
-void DGeniusCanvas :: showSpriteBT()
+void ScreenLockCanvas :: showSpriteBT()
 {
     BT_sprite->show();
 }
 
-void DGeniusCanvas :: hideSpriteBT()
+void ScreenLockCanvas :: hideSpriteBT()
 {
     BT_sprite->hide();
 }
 
-void DGeniusCanvas :: updateScreenSprite( )
+void ScreenLockCanvas :: updateScreenSprite( )
 {
     get_time_ch();
     char **screen_xpm[12];
@@ -148,14 +151,49 @@ void DGeniusCanvas :: updateScreenSprite( )
 }
 
 
-void DGeniusCanvas :: showString( const QString& info)
+void ScreenLockCanvas :: showString( const QString& info)
 {
     presskeyMsg->setText(info);
     presskeyMsg->show( );
 }
 
-void DGeniusCanvas :: hideString( )
+void ScreenLockCanvas :: hideString( )
 {
     presskeyMsg->hide();
+}
+
+void ScreenLockCanvas :: iconcheckBT( )
+{
+    static bool btstatus = false;
+    bool bt_ = UTIL_GetBtStatus();
+    if(btstatus != bt_){
+        btstatus = bt_;
+        if (btstatus) {
+            showSpriteBT();
+        }else
+        {
+            hideSpriteBT ();
+        }
+    }
+}
+
+void ScreenLockCanvas :: iconcheckNoti( )
+{
+    static bool fnotification = false;
+    bool fnotifi = UTIL_GetNotificationStatus();
+    if(fnotification != fnotifi)
+    {
+        printf("Notification status: %d\n",fnotifi);
+        fnotification = fnotifi;
+        if(fnotification)
+        {
+            showSpritesms();
+            showSpriteCall();
+        }else
+        {
+            hideSpritesms();
+            hideSpriteCall();
+        }
+    }
 }
 

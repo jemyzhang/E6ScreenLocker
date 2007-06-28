@@ -1,6 +1,6 @@
 
-#ifndef _DGENIUSCANVAS_H_
-#define _DGENIUSCANVAS_H_
+#ifndef _SCREENLOCKCANVAS_H_
+#define _SCREENLOCKCANVAS_H_
 
 #include <qcanvas.h>
 #include <qpixmap.h>
@@ -9,9 +9,9 @@
 #include <stdio.h>
 #include "pictures.h"
 #include <time.h>
-#include "dgenius.h"
+#include "screenlock.h"
 
-class DGeniusCanvas : public QCanvas
+class ScreenLockCanvas : public QCanvas
 {
     QCanvasPixmap *img[12];
     QCanvasPixmapArray imgarray[12];
@@ -47,8 +47,10 @@ class DGeniusCanvas : public QCanvas
         void hideString( );
         void updateScreenSprite( );
         
+        void iconcheckBT( );
+        void iconcheckNoti( );
     
-        DGeniusCanvas( int w, int h ) : QCanvas( w, h )
+        ScreenLockCanvas( int w, int h ) : QCanvas( w, h )
         {
             init();
 
@@ -88,6 +90,8 @@ class DGeniusCanvas : public QCanvas
             Lockimg_array->setImage(0,Lock_img);
             BT_sprite = new QCanvasSprite(Lockimg_array,this);
 
+            iconcheckBT();
+            iconcheckNoti();
             //setup time array
             updateScreenSprite( );
 
@@ -103,7 +107,7 @@ class DGeniusCanvas : public QCanvas
         }
 
         
-        virtual ~DGeniusCanvas( ) {
+        virtual ~ScreenLockCanvas( ) {
             printf("delete image source\n");
             delete[] Screen_sprite;
             delete[] img;

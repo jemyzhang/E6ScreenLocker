@@ -23,16 +23,16 @@ GZIP	=	gzip -9f
 
 ####### Files
 
-HEADERS =	dgenius.h dgeniuscanvas.h dgeniusengine.h
-SOURCES =	dgenius.cpp dgeniuscanvas.cpp dgeniusengine.cpp
-OBJECTS =	dgenius.o dgeniuscanvas.o dgeniusengine.o
+HEADERS =	screenlock.h screenlockcanvas.h screenlockengine.h
+SOURCES =	screenlock.cpp screenlockcanvas.cpp screenlockengine.cpp
+OBJECTS =	screenlock.o screenlockcanvas.o screenlockengine.o
 INTERFACES =	
 UICDECLS =	
 UICIMPLS =	
 SRCMOC	=	
 OBJMOC	=	
 DIST	=	
-TARGET	=	dgenius
+TARGET	=	screenlocker
 INTERFACE_DECL_PATH = .
 
 ####### Implicit rules
@@ -65,11 +65,11 @@ $(TARGET): $(UICDECLS) $(OBJECTS) $(OBJMOC)
 moc: $(SRCMOC)
 
 tmake:
-	tmake dgenius.pro
+	tmake screenlock.pro
 
 dist:
-	tar czvf dgenius.pkg busybox dgenius.lin dgenius dgenius.gif dgenius_sm.gif swap.bin dgenius.desktop README.txt
-	zip dgenius.zip dgenius.pkg README.txt
+	tar czvf screenlock.pkg busybox screenlock.lin screenlock screenlock.gif screenlock_sm.gif swap.bin screenlock.desktop README.txt
+	zip screenlock.zip screenlock.pkg README.txt
 
 clean:
 	-rm -f $(OBJECTS) $(OBJMOC) $(SRCMOC) $(UICIMPLS) $(UICDECLS) $(TARGET)
@@ -83,7 +83,7 @@ clean:
 
 ####### Compile
 
-dgenius.o: dgenius.cpp dgenius.h
-dgeniuscanvas.o: dgeniuscanvas.cpp dgeniuscanvas.h
-dgeniusengine.o: dgeniusengine.cpp dgeniusengine.h
+screenlock.o: screenlock.cpp screenlock.h
+screenlockcanvas.o: screenlockcanvas.cpp screenlockcanvas.h
+screenlockengine.o: screenlockengine.cpp screenlockengine.h
 
