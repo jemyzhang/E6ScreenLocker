@@ -10,7 +10,7 @@
 
 int main( int argc, char **argv )
 {
-    printf("ScreenLocker ver.1.0beta(20070628-01.12) by Jemyzhang\n");
+    printf("ScreenLocker ver.1.0beta(20070629-01.12) by Jemyzhang\n");
     DApplication app( argc, argv );
     ScreenLockCanvas *canvas = new ScreenLockCanvas( 236, 316 );
     QCanvasView *view = new QCanvasView( canvas );

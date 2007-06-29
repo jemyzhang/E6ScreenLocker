@@ -23,9 +23,9 @@ GZIP	=	gzip -9f
 
 ####### Files
 
-HEADERS =	screenlock.h screenlockcanvas.h screenlockengine.h
-SOURCES =	screenlock.cpp screenlockcanvas.cpp screenlockengine.cpp
-OBJECTS =	screenlock.o screenlockcanvas.o screenlockengine.o
+HEADERS =	screenlock.h screenlockcanvas.h screenlockengine.h dapplication.h
+SOURCES =	screenlock.cpp screenlockcanvas.cpp screenlockengine.cpp dapplication.cpp
+OBJECTS =	screenlock.o screenlockcanvas.o screenlockengine.o dapplication.o
 INTERFACES =	
 UICDECLS =	
 UICIMPLS =	
@@ -86,4 +86,5 @@ clean:
 screenlock.o: screenlock.cpp screenlock.h
 screenlockcanvas.o: screenlockcanvas.cpp screenlockcanvas.h
 screenlockengine.o: screenlockengine.cpp screenlockengine.h
+dapplication.o: dapplication.cpp dapplication.h
 

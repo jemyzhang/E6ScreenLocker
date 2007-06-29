@@ -23,8 +23,13 @@ QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
 void ScreenLockEngine :: run( )
 {
     ishide = false;
+    LoadConfig();
+    if(autolock_interval == 0){
+        ifautolock = false;        
+    }
+    canvas->setAutoLockimg(ifautolock);
     PM_setupLcdSleepTime(0);
-    backlightctrl(true);
+    backlightctrl(true,lock_brightness);
     usleep(500);
     getSysDefine( );
     while(1)
@@ -42,7 +47,7 @@ void ScreenLockEngine :: run( )
         }else
         {
             timeout ++;
-            if(timeout > 3) {
+            if(timeout > lock_light_timeout) {
                 timeout = 0;
                 if(true == backlightstatus()) backlightctrl(false);
             }
@@ -61,7 +66,7 @@ void ScreenLockEngine :: run( )
             }
             timecnt ++;
         }
-        autolock( );        
+        autolock( ifautolock );        
         incomecheck(); // hide canvas while incoming call and show canvas after incoming call
         sleep(1);
     }
@@ -88,10 +93,20 @@ void ScreenLockEngine :: pointerPressed( int x, int y )
     std::cout << "Pointer pressed on " << x << "," << y << std::endl;
     if( x > 220 && y < 10 )
     {
+        SaveConfig();
         PM_setupLcdSleepTime(sys_lcdsleeptime);
         backlightctrl(true,sys_brightness);
         DApplication :: exit();
         ::exit( 0 );
+    }else if (x > 110 && y > 300 && x < 120) {
+        if (ifautolock) {
+            ifautolock = false;
+        }else
+        {
+            ifautolock = true;
+        }
+        printf("auto lock mode: %d\n",ifautolock);
+        canvas->setAutoLockimg(ifautolock);
     }
     
 }
@@ -117,11 +132,13 @@ void ScreenLockEngine :: keyPressed(int keycode)
         if(4145 == keycode)
         {
             hidepressed = true ;
+            if (ifshowinstruction) {
             #if 0
             canvas->showString("\n  Unlock: Now Press Right Key.");
             #else
             canvas->showString(utf8->toUnicode("\n         解锁:请再按右方向键."));
             #endif
+            }
             canvas->showSpriteLock();
             canvas->update();
         }else if( 4116 == keycode && true == hidepressed )
@@ -131,11 +148,13 @@ void ScreenLockEngine :: keyPressed(int keycode)
         }else
         {
             hidepressed = false;
+            if (ifshowinstruction) {
             #if 0
             canvas->showString("\n  Unlock: First Press Hangup Key, \n   Then Press Right Key.");
             #else
             canvas->showString(utf8->toUnicode("\n         解锁:请先按挂机键,\n               再按右方向键."));
             #endif
+            }
             canvas->showSpriteLock();
             canvas->update();
         }
@@ -180,7 +199,7 @@ void ScreenLockEngine :: showScreenSaver()
         printf("Tune LCD Sleep Mode to None...\n");
         PM_setupLcdSleepTime(0);
     }
-    backlightctrl(true);
+    backlightctrl(true,lock_brightness);
 }
 
 void ScreenLockEngine :: hideScreenSaver()
@@ -189,7 +208,10 @@ void ScreenLockEngine :: hideScreenSaver()
     //view->showMinimized();
     view->hide();
     ishide = true;
-    backlightctrl(true,0x19);
+    backlightctrl(true,sys_brightness);
+    if (0 == autolock_interval) {
+        PM_setupLcdSleepTime(sys_lcdsleeptime);
+    }
 }
 
 void ScreenLockEngine :: backlightctrl(bool onoff,int brightness)
@@ -259,7 +281,7 @@ void ScreenLockEngine :: incomecheck( )
     if (incall_ &&  !ishide) {
         printf("Incoming Call, canvas hide...\n");
         hideScreenSaver();
-        if(!backlightstatus()) backlightctrl(true);
+        if(!backlightstatus()) backlightctrl(true,lock_brightness);
         timeout = 0;
         fincomecall = incall_;
     }else if (fincomecall && !incall_ && ishide && !UTIL_GetCallConnectedStatus()) {
@@ -286,11 +308,27 @@ void ScreenLockEngine :: setAutolockInterval(int interval)
     printf("Set autolock interval: %d\n",interval);
 }
 
-void ScreenLockEngine :: autolock( )
+void ScreenLockEngine :: autolock(bool ctrl )
 {
-    if (0 == autolock_interval || !ishide) {   //if autolock_interval equals 0, then autolock is disabled
+    static bool updatelcdsleep = false;
+
+    if (!ishide) {   //if autolock_interval equals 0, then autolock is disabled
+        updatelcdsleep = false;
         return;
     }
+
+    if (false == ctrl) {
+        if ( false == updatelcdsleep) {
+            printf("Recover lcdsleeptime to:%d\n",sys_lcdsleeptime);
+            PM_setupLcdSleepTime(sys_lcdsleeptime);
+            updatelcdsleep = true;
+        }
+        return;
+    }else
+    {
+        updatelcdsleep = false;
+    }
+
     static int cnt = 0;
     if (UTIL_GetTimingPhoneLock() || UTIL_GetCallConnectedStatus()) {   //disable autolock while calling
         cnt = 0;
@@ -301,13 +339,89 @@ void ScreenLockEngine :: autolock( )
     if (cnt > autolock_interval) {
             printf("Screen is autolocked...\n");
             cnt = 0;
-            backlightctrl(false);
+            backlightctrl(false,lock_brightness);
             showScreenSaver();
     }
 }
 
 void ScreenLockEngine :: getSysDefine( )
 {
+    printf("Load system settings...");
+    QFile file("/ezx_user/download/appwrite/setup/ezx_system.cfg");
+
     sys_brightness = 0x19;
     sys_lcdsleeptime = 30;
+
+    if(file.exists () && file.open( IO_ReadOnly )) {
+        QString line;
+        QTextStream stream(&file);
+        char tmp[512];
+        while(!stream.eof()) {
+            line = stream.readLine();
+            if(line.contains("Brightness = ")) {
+                sscanf(line.latin1(),"%s = %d",tmp,&sys_brightness);
+                printf("brightness:%d ",sys_brightness);
+            }else if(line.contains("LcdSleepTime = ")){
+                sscanf(line.latin1(),"%s = %d",tmp,&sys_lcdsleeptime);
+                sys_lcdsleeptime = lcdsleeptime_ref[sys_lcdsleeptime];
+                printf("lcdsleeptime:%d\n",sys_lcdsleeptime);
+            }
+        }
+        file.close();
+    }else{
+        printf("failed,use default value\n");
+    }
+
 }
+
+void ScreenLockEngine :: LoadConfig()
+{
+    ifautolock = true;
+    autolock_interval = 20;
+    lock_brightness = 10;
+    lock_light_timeout = 3;
+    ifshowinstruction = true;
+    char tmp[10];
+    for(int i = 0; i < sizeof(tmp); i++){
+        tmp[i] = 0;
+    }
+    if(DApplication::LoadAppConfig("AutoLockONOFF",tmp)){
+        ifautolock = atoi(tmp);
+        for(int i = 0; i < sizeof(tmp); i++){
+            tmp[i] = 0;
+        }
+    }
+    if(DApplication::LoadAppConfig("AutoLockPeriod",tmp)){
+        autolock_interval = atoi(tmp);
+        for(int i = 0; i < sizeof(tmp); i++){
+            tmp[i] = 0;
+        }
+    }
+    if(DApplication::LoadAppConfig("LockOnBrightness",tmp)){
+        lock_brightness = atoi(tmp);
+        for(int i = 0; i < sizeof(tmp); i++){
+            tmp[i] = 0;
+        }
+    }
+    if(DApplication::LoadAppConfig("LockLightOnTimeout",tmp)){
+        lock_light_timeout = atoi(tmp);
+        for(int i = 0; i < sizeof(tmp); i++){
+            tmp[i] = 0;
+        }
+    }
+    if(DApplication::LoadAppConfig("ShowInstruction",tmp)){
+        ifshowinstruction = atoi(tmp);
+    }
+}
+
+void ScreenLockEngine :: SaveConfig( )
+{
+    DApplication::SaveAppConfig("BackgroundImage",canvas->getBackgroundimg());
+    DApplication::SaveAppConfig("AutoLockONOFF",QString::number(ifautolock).latin1());
+    DApplication::SaveAppConfig("AutoLockPeriod",QString::number(autolock_interval).latin1());
+    DApplication::SaveAppConfig("LockLightOnTimeout",QString::number(lock_light_timeout).latin1());
+    DApplication::SaveAppConfig("LockOnBrightness",QString::number(lock_brightness).latin1());
+    DApplication::SaveAppConfig("LockLightOnTimeout",QString::number(lock_light_timeout).latin1());
+    DApplication::SaveAppConfig("ShowInstruction",QString::number(ifshowinstruction).latin1());
+}
+

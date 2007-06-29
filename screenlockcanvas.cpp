@@ -51,8 +51,9 @@ void ScreenLockCanvas :: get_time_ch( )
 }
 
 void ScreenLockCanvas :: loadBGimg( )
-{   
-    bg_img = new QCanvasPixmap(QPixmap("screenlock.bg"),QPoint(0,0));
+{
+    DApplication::LoadAppConfig("BackgroundImage",bgfile);
+    bg_img = new QCanvasPixmap(QPixmap(bgfile),QPoint(0,0));
     if(bg_img->isNull())
     {
         delete bg_img;
@@ -197,3 +198,17 @@ void ScreenLockCanvas :: iconcheckNoti( )
     }
 }
 
+void ScreenLockCanvas :: setAutoLockimg(bool status)
+{
+    #if 1
+    if(status){
+        AutoLock_sprite[0]->hide();
+        AutoLock_sprite[1]->show();
+    }else
+    {
+        AutoLock_sprite[0]->show();
+        AutoLock_sprite[1]->hide();
+    }
+    this->update();
+    #endif
+}

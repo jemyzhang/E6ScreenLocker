@@ -3,6 +3,8 @@
 #define _SCREENLOCKENGINE_H_
 
 #include <qthread.h>
+#include <qfile.h>
+#include <qtextstream.h>
 #include "dapplication.h"
 #include "screenlockcanvas.h"
 
@@ -24,18 +26,24 @@ class ScreenLockEngine : public QThread, PointerListener
         bool showpressed;
         bool ishide;
         bool req_update;
+        bool ifautolock;
+        bool ifshowinstruction;
         unsigned char timecnt;
         unsigned char timeout;
         int autolock_interval;
+        int lock_light_timeout;
+        int lock_brightness;
         int sys_brightness;
         int sys_lcdsleeptime;
+        void LoadConfig( );
+        void SaveConfig( );
         void showScreenSaver( );
         void hideScreenSaver( );
         void backlightctrl(bool onoff,int brightness = 10);
         void keylightctrl(bool onoff);
         int backlightstatus( );
         void incomecheck( );
-        void autolock( ); //screen auto lock
+        void autolock(bool ctrl = true); //screen auto lock
         void getSysDefine( ); //get system defined brightness and lcd sleep time
 
     public:
@@ -48,7 +56,6 @@ class ScreenLockEngine : public QThread, PointerListener
             ishide = false;
             timecnt = 0;
         }
-        
         virtual void run( );
         void setview(QCanvasView *canvasview,DApplication *app);
         void pointerPressed( int x, int y );
@@ -59,5 +66,8 @@ class ScreenLockEngine : public QThread, PointerListener
         void QCopReceived(int message);
 };
 
+static const int lcdsleeptime_ref[] = {
+    30,60,60*5,60*10,
+};
 #endif
 

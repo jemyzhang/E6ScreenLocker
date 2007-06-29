@@ -10,6 +10,7 @@
 #include "pictures.h"
 #include <time.h>
 #include "screenlock.h"
+#include "dapplication.h"
 
 class ScreenLockCanvas : public QCanvas
 {
@@ -18,13 +19,19 @@ class ScreenLockCanvas : public QCanvas
     QCanvasPixmap *bg_img;
     QCanvasPixmapArray *bgimg_array;
 
+    QCanvasPixmap *auto_img;
+    QCanvasPixmapArray *autoimg_array;
+
     QCanvasSprite *Screen_sprite[12];
     QCanvasSprite *Lock_sprite;
     QCanvasSprite *sms_sprite;
     QCanvasSprite *Call_sprite;
     QCanvasSprite *BT_sprite;
     QCanvasSprite *BG_sprite;
+    QCanvasSprite *AutoLock_sprite[2];
     QCanvasText *presskeyMsg;
+
+    char bgfile[1024];
     char digi_buf[12];
 	char digi_backup[12];
 
@@ -49,6 +56,8 @@ class ScreenLockCanvas : public QCanvas
         
         void iconcheckBT( );
         void iconcheckNoti( );
+        void setAutoLockimg(bool status);   //status: true/false
+        char* getBackgroundimg(){return bgfile;};
     
         ScreenLockCanvas( int w, int h ) : QCanvas( w, h )
         {
@@ -89,6 +98,16 @@ class ScreenLockCanvas : public QCanvas
             Lockimg_array = new QCanvasPixmapArray( );
             Lockimg_array->setImage(0,Lock_img);
             BT_sprite = new QCanvasSprite(Lockimg_array,this);
+
+            auto_img = new QCanvasPixmap(Control_gray_xpm,QPoint(-110,-300));
+            autoimg_array = new QCanvasPixmapArray( );
+            autoimg_array->setImage(0,auto_img);
+            AutoLock_sprite[0] = new QCanvasSprite(autoimg_array,this);
+
+            auto_img = new QCanvasPixmap(Control_xpm,QPoint(-110,-300));
+            autoimg_array = new QCanvasPixmapArray( );
+            autoimg_array->setImage(0,auto_img);
+            AutoLock_sprite[1] = new QCanvasSprite(autoimg_array,this);
 
             iconcheckBT();
             iconcheckNoti();
