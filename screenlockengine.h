@@ -15,12 +15,13 @@
 #define FBIOGETBRIGHTNESS       0x461C 
 
 
-class ScreenLockEngine : public QThread, PointerListener
+class ScreenLockEngine : public PointerListener
 {
     private:
         ScreenLockCanvas *canvas;
         QCanvasView *view;
         DApplication *DApp;
+        bool startup;
         bool keypressed;
         bool hidepressed;
         bool showpressed;
@@ -54,9 +55,12 @@ class ScreenLockEngine : public QThread, PointerListener
             hidepressed = false;
             showpressed = false;
             ishide = false;
+            startup = false;
             timecnt = 0;
+            timeout = 0;
         }
-        virtual void run( );
+        void initial( );
+        void checkprocess( );
         void setview(QCanvasView *canvasview,DApplication *app);
         void pointerPressed( int x, int y );
         void pointerDragged( int x, int y );

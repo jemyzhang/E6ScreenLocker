@@ -20,9 +20,11 @@ extern "C" int PM_setupLcdSleepTime(int sleepseconds);
 
 QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
 
-void ScreenLockEngine :: run( )
+void ScreenLockEngine :: initial( )
 {
+    startup = true;
     ishide = false;
+    getSysDefine( );
     LoadConfig();
     if(autolock_interval == 0){
         ifautolock = false;        
@@ -30,53 +32,52 @@ void ScreenLockEngine :: run( )
     canvas->setAutoLockimg(ifautolock);
     PM_setupLcdSleepTime(0);
     backlightctrl(true,lock_brightness);
-    usleep(500);
-    getSysDefine( );
-    while(1)
-    {
-        struct tm *tm_ptr;
-        time_t now;
-        time(&now); 
-        tm_ptr = localtime(&now);
-        if (tm_ptr->tm_sec == 0 ) {
-            req_update = true;
-        }
+    printf("initial over...\n");
+}
 
-        if (ishide) {
-            timeout = 0;    //for backlight timeout
-        }else
-        {
-            timeout ++;
-            if(timeout > lock_light_timeout) {
-                timeout = 0;
-                if(true == backlightstatus()) backlightctrl(false);
-            }
-        }
-
-        if( true == keypressed)
-        {
-            if ( timecnt > 1 ){
-                timecnt = 0;
-                hidepressed = false;
-                showpressed = false;
-                keypressed = false;
-                canvas->hideString();
-                canvas->hideSpriteLock();
-                canvas->update();
-            }
-            timecnt ++;
-        }
-        autolock( ifautolock );        
-        incomecheck(); // hide canvas while incoming call and show canvas after incoming call
-        sleep(1);
+void ScreenLockEngine :: checkprocess( )
+{
+    struct tm *tm_ptr;
+    time_t now;
+    time(&now); 
+    tm_ptr = localtime(&now);
+    if (tm_ptr->tm_sec == 0 ) {
+        req_update = true;
     }
+
+    if (ishide) {
+        timeout = 0;    //for backlight timeout
+    }else
+    {
+        if(timeout > lock_light_timeout) {
+            timeout = 0;
+            if(true == backlightstatus()) backlightctrl(false);
+        }
+        timeout ++;
+    }
+
+    if( true == keypressed)
+    {
+        if ( timecnt > 1 ){
+            timecnt = 0;
+            hidepressed = false;
+            showpressed = false;
+            keypressed = false;
+            canvas->hideString();
+            canvas->hideSpriteLock();
+            canvas->update();
+        }
+        timecnt ++;
+    }
+    autolock( ifautolock );        
+    incomecheck(); // hide canvas while incoming call and show canvas after incoming call
 }
 
 void ScreenLockEngine :: QCopReceived(int message)
 {
     static bool flag = false;
     if (message == 5) {
-        if (!ishide && !(view->isActiveWindow()) && false == flag) {
+        if (!ishide && !(view->isActiveWindow()) && false == flag && false == startup) {
             flag = true;
             backlightctrl(false);
             showScreenSaver();
@@ -84,6 +85,7 @@ void ScreenLockEngine :: QCopReceived(int message)
         }else
         {
             flag = false;
+            startup = false;
         }
     }
 }
@@ -98,7 +100,7 @@ void ScreenLockEngine :: pointerPressed( int x, int y )
         backlightctrl(true,sys_brightness);
         DApplication :: exit();
         ::exit( 0 );
-    }else if (x > 110 && y > 300 && x < 120) {
+    }else if (x > 110 && y > 300 && x < 130) {
         if (ifautolock) {
             ifautolock = false;
         }else
@@ -123,7 +125,6 @@ void ScreenLockEngine :: pointerReleased( int x, int y )
 
 void ScreenLockEngine :: keyPressed(int keycode)
 {
-
     keypressed = true ;
     timecnt = 0;
     if (false == ishide) {

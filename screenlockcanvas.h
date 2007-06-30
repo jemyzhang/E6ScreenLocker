@@ -122,7 +122,7 @@ class ScreenLockCanvas : public QCanvas
     	 	presskeyMsg->setColor(qRgb( 180,64,64));
 
             //setup background color
-            setBackgroundColor( qRgb( 0xff, 0xff, 0xff) );
+//            setBackgroundColor( qRgb( 0xff, 0xff, 0xff) );
         }
 
         

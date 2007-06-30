@@ -28,9 +28,11 @@ void ScreenLockCanvas :: get_time_ch( )
     char tmp;
     tmp = tm_ptr->tm_hour;// + 8;
     digi_buf[4] = 0;
+    if (tmp > 11) {
+        digi_buf[4] = 1;
+    }
     if(tmp > 12){
         tmp = tmp - 12;
-        digi_buf[4] = 1;
     }
     digi_buf[0] = tmp / 10;
     digi_buf[1] = tmp % 10;
@@ -212,3 +214,4 @@ void ScreenLockCanvas :: setAutoLockimg(bool status)
     this->update();
     #endif
 }
+

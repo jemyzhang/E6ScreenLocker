@@ -68,8 +68,8 @@ tmake:
 	tmake screenlock.pro
 
 dist:
-	tar czvf screenlock.pkg busybox screenlock.lin screenlock screenlock.gif screenlock_sm.gif swap.bin screenlock.desktop README.txt
-	zip screenlock.zip screenlock.pkg README.txt
+	tar czvf screenlock.pkg sl.lin screenlocker Lock.png Lock_sm.png screenlock.desktop
+	zip screenlock.zip screenlock.pkg
 
 clean:
 	-rm -f $(OBJECTS) $(OBJMOC) $(SRCMOC) $(UICIMPLS) $(UICDECLS) $(TARGET)
