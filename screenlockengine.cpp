@@ -305,7 +305,7 @@ void ScreenLockEngine :: incomecheck( )
         printf("Call connected...\n");
         fcalling = calling;
         PM_setupLcdSleepTime(sys_lcdsleeptime); //restore lcd sleep time
-    }
+    }else if(!calling) fcalling = calling; //reset call status
 }
 
 void ScreenLockEngine :: setAutolockInterval(int interval)
