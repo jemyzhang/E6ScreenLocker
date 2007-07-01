@@ -17,6 +17,7 @@ extern "C" int  UTIL_GetTimingPhoneLock();
 
 extern "C" int PM_setupLcdSleepTime(int sleepseconds);
 
+extern "C" int  UTIL_GetPhoneInCall();
 
 QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
 
@@ -278,14 +279,17 @@ void ScreenLockEngine :: incomecheck( )
 {
     static bool fincomecall = false;
     static bool checktwice = false;
+    static bool fcalling = false;
+
     bool incall_ = UTIL_GetIncomingCallStatus();
+    bool calling = UTIL_GetPhoneInCall();
     if (incall_ &&  !ishide) {
         printf("Incoming Call, canvas hide...\n");
         hideScreenSaver();
         if(!backlightstatus()) backlightctrl(true,lock_brightness);
         timeout = 0;
         fincomecall = incall_;
-    }else if (fincomecall && !incall_ && ishide && !UTIL_GetCallConnectedStatus()) {
+    }else if (fincomecall && !incall_ && ishide && !calling) {
         if( checktwice)
         {
             showScreenSaver();
@@ -296,10 +300,11 @@ void ScreenLockEngine :: incomecheck( )
             printf("Call rejected or missed, check again................\n");
             checktwice = true ;
         }
-    }else if (fincomecall && !incall_ && ishide && UTIL_GetCallConnectedStatus())
+    }else if (ishide && calling && fcalling != calling)
     {
         printf("Call connected...\n");
-        fincomecall = false;    //if the phone is picked up, do not lock the phone after hangup
+        fcalling = calling;
+        PM_setupLcdSleepTime(sys_lcdsleeptime); //restore lcd sleep time
     }
 }
 
@@ -331,7 +336,7 @@ void ScreenLockEngine :: autolock(bool ctrl )
     }
 
     static int cnt = 0;
-    if (UTIL_GetTimingPhoneLock() || UTIL_GetCallConnectedStatus()) {   //disable autolock while calling
+    if (UTIL_GetTimingPhoneLock() || UTIL_GetPhoneInCall()) {   //disable autolock while calling
         cnt = 0;
     }else
     {

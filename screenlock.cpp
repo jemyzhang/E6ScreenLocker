@@ -21,7 +21,7 @@ void mainloop(int signo)
 
 int main( int argc, char **argv )
 {
-    printf("ScreenLocker ver.1.0beta(20070630-01.6) by Jemyzhang\n");
+    printf("ScreenLocker ver.1.0beta(20070701-01.2) by Jemyzhang\n");
     DApplication app( argc, argv );
     ScreenLockCanvas *canvas = new ScreenLockCanvas( 236, 316 );
     QCanvasView *view = new QCanvasView( canvas );
