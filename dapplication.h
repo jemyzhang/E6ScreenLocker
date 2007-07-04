@@ -31,6 +31,7 @@ class PointerListener
         virtual void pointerReleased( int x, int y) = 0;
         virtual void keyPressed(int keycode) = 0;
         virtual void QCopReceived(int message) = 0;
+        virtual void PropertyReceived( ) = 0;
 };
 
 class DApplication : public ZApplication {

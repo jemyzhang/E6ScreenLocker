@@ -165,14 +165,15 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
          break;
          
          case QWSEvent::PropertyNotify:
-             printf("PropertyNotify\n");
              if (propertyNotify==0)
                  return 0;
-                 
+             pointerListener->PropertyReceived();
+/*                
              printf("propertyNotify %d %d %d\n",
                  propertyNotify->simpleData.window,
                  propertyNotify->simpleData.property,
                  propertyNotify->simpleData.state);
+*/ 
          break;
          
          case QWSEvent::PropertyReply:

@@ -19,9 +19,26 @@ void mainloop(int signo)
     }
 }
 
+void killhandle(int signo)
+{
+    switch(signo) {
+    case SIGTERM:
+        printf("catch signal: SIGTERM\n");
+        break;
+    case SIGINT:
+        printf("catch signal: SIGTERM\n");
+        break;
+    default:
+        printf("catch signal: UNKNOWN[%d]\n",signo);
+        return;
+    }
+    engine->beforeterminate();
+    exit(0);
+}
+
 int main( int argc, char **argv )
 {
-    printf("ScreenLocker ver.1.0beta(20070701-01.2) by Jemyzhang\n");
+    printf("ScreenLocker ver 1.0(20070704-01.2) by Jemyzhang\n");
     DApplication app( argc, argv );
     ScreenLockCanvas *canvas = new ScreenLockCanvas( 236, 316 );
     QCanvasView *view = new QCanvasView( canvas );
@@ -34,6 +51,8 @@ int main( int argc, char **argv )
     app.setPointerListener( (PointerListener*) engine );
 
     signal(SIGALRM,mainloop);
+    signal(SIGTERM,killhandle);
+    signal(SIGINT,killhandle);
     struct itimerval value;
     value.it_value.tv_sec = 1;
     value.it_value.tv_usec = 0;

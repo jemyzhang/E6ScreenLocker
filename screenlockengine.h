@@ -60,6 +60,7 @@ class ScreenLockEngine : public PointerListener
             timeout = 0;
         }
         void initial( );
+        void beforeterminate( );
         void checkprocess( );
         void setview(QCanvasView *canvasview,DApplication *app);
         void pointerPressed( int x, int y );
@@ -68,6 +69,7 @@ class ScreenLockEngine : public PointerListener
         void keyPressed(int keycode);
         void setAutolockInterval(int interval);
         void QCopReceived(int message);
+        void PropertyReceived( );
 };
 
 static const int lcdsleeptime_ref[] = {

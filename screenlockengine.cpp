@@ -42,8 +42,9 @@ void ScreenLockEngine :: checkprocess( )
     time_t now;
     time(&now); 
     tm_ptr = localtime(&now);
-    if (tm_ptr->tm_sec == 0 ) {
-        req_update = true;
+    if (tm_ptr->tm_sec == 0 && !ishide) {
+//        req_update = true;
+        canvas->updateScreenSprite( );
     }
 
     if (ishide) {
@@ -91,14 +92,22 @@ void ScreenLockEngine :: QCopReceived(int message)
     }
 }
 
+void ScreenLockEngine :: PropertyReceived( )
+{
+    if (!ishide && !startup) {
+        printf("What's happend, let's see...\n");
+        hideScreenSaver();
+        if(!backlightstatus()) backlightctrl(true,lock_brightness);
+        timeout = 0;
+    }
+}
+
 void ScreenLockEngine :: pointerPressed( int x, int y )
 {
-    std::cout << "Pointer pressed on " << x << "," << y << std::endl;
+//    std::cout << "Pointer pressed on " << x << "," << y << std::endl;
     if( x > 220 && y < 10 )
     {
-        SaveConfig();
-        PM_setupLcdSleepTime(sys_lcdsleeptime);
-        backlightctrl(true,sys_brightness);
+        beforeterminate( );
         DApplication :: exit();
         ::exit( 0 );
     }else if (x > 110 && y > 300 && x < 130) {
@@ -187,11 +196,12 @@ void ScreenLockEngine :: showScreenSaver()
 
     canvas->iconcheckBT();
     canvas->iconcheckNoti();
+/*
     if(true == req_update) {
         canvas->updateScreenSprite( );
         req_update = false;
     }
-
+*/
     view->showFullScreen();
     view->show();
     ishide = false;
@@ -430,4 +440,9 @@ void ScreenLockEngine :: SaveConfig( )
     DApplication::SaveAppConfig("LockLightOnTimeout",QString::number(lock_light_timeout).latin1());
     DApplication::SaveAppConfig("ShowInstruction",QString::number(ifshowinstruction).latin1());
 }
-
+void ScreenLockEngine :: beforeterminate( )
+{
+    SaveConfig();
+    PM_setupLcdSleepTime(sys_lcdsleeptime);
+    backlightctrl(true,sys_brightness);
+}
