@@ -22,6 +22,9 @@ void mainloop(int signo)
 void killhandle(int signo)
 {
     switch(signo) {
+    case SIGILL:
+    case SIGSEGV:
+    case SIGABRT:
     case SIGTERM:
         printf("catch signal: SIGTERM\n");
         break;
@@ -38,7 +41,7 @@ void killhandle(int signo)
 
 int main( int argc, char **argv )
 {
-    printf("ScreenLocker ver 1.0(20070704-01.2) by Jemyzhang\n");
+    printf("ScreenLocker %s by Jemyzhang\n",VERSION);
     DApplication app( argc, argv );
     ScreenLockCanvas *canvas = new ScreenLockCanvas( 236, 316 );
     QCanvasView *view = new QCanvasView( canvas );

@@ -30,7 +30,12 @@ void ScreenLockEngine :: initial( )
     if(autolock_interval == 0){
         ifautolock = false;        
     }
-    canvas->setAutoLockimg(ifautolock);
+    if (ifshowdeskicon) {
+        canvas->setAutoLockimg(ifautolock);
+    }else
+    {
+        canvas->hideAutoLockimg();
+    }
     PM_setupLcdSleepTime(0);
     backlightctrl(true,lock_brightness);
     printf("initial over...\n");
@@ -42,9 +47,14 @@ void ScreenLockEngine :: checkprocess( )
     time_t now;
     time(&now); 
     tm_ptr = localtime(&now);
-    if (tm_ptr->tm_sec == 0 && !ishide) {
-//        req_update = true;
-        canvas->updateScreenSprite( );
+    if (tm_ptr->tm_sec == 0) {
+        if(ishide){
+            req_update = true;
+        }else
+        {
+            req_update = false;
+            canvas->updateScreenSprite( );
+        }
     }
 
     if (ishide) {
@@ -53,9 +63,9 @@ void ScreenLockEngine :: checkprocess( )
     {
         if(timeout > lock_light_timeout) {
             timeout = 0;
-            if(true == backlightstatus()) backlightctrl(false);
+            backlightctrl(false);
         }
-        timeout ++;
+        if(req_lightoff) timeout ++;
     }
 
     if( true == keypressed)
@@ -94,7 +104,7 @@ void ScreenLockEngine :: QCopReceived(int message)
 
 void ScreenLockEngine :: PropertyReceived( )
 {
-    if (!ishide && !startup) {
+    if (!ishide && !startup && ifhide4sms) {
         printf("What's happend, let's see...\n");
         hideScreenSaver();
         if(!backlightstatus()) backlightctrl(true,lock_brightness);
@@ -111,6 +121,7 @@ void ScreenLockEngine :: pointerPressed( int x, int y )
         DApplication :: exit();
         ::exit( 0 );
     }else if (x > 110 && y > 300 && x < 130) {
+        if(!ifshowdeskicon) return;
         if (ifautolock) {
             ifautolock = false;
         }else
@@ -144,11 +155,11 @@ void ScreenLockEngine :: keyPressed(int keycode)
         {
             hidepressed = true ;
             if (ifshowinstruction) {
-            #if 0
-            canvas->showString("\n  Unlock: Now Press Right Key.");
-            #else
-            canvas->showString(utf8->toUnicode("\n         解锁:请再按右方向键."));
-            #endif
+                if(0 == LANGID) {
+                    canvas->showString("\n  Unlock: Now Press Right Key.");
+                }else{
+                    canvas->showString(utf8->toUnicode("\n         解锁:请再按右方向键."));
+                }
             }
             canvas->showSpriteLock();
             canvas->update();
@@ -160,11 +171,11 @@ void ScreenLockEngine :: keyPressed(int keycode)
         {
             hidepressed = false;
             if (ifshowinstruction) {
-            #if 0
-            canvas->showString("\n  Unlock: First Press Hangup Key, \n   Then Press Right Key.");
-            #else
-            canvas->showString(utf8->toUnicode("\n         解锁:请先按挂机键,\n               再按右方向键."));
-            #endif
+                if( 0 == LANGID ) {
+                    canvas->showString("\n  Unlock: First Press Hangup Key, \n   Then Press Right Key.");
+                }else{
+                    canvas->showString(utf8->toUnicode("\n         解锁:请先按挂机键,\n               再按右方向键."));
+                }
             }
             canvas->showSpriteLock();
             canvas->update();
@@ -237,10 +248,12 @@ void ScreenLockEngine :: backlightctrl(bool onoff,int brightness)
         ioctl(fbd,FBIOBLANK,0);
         ioctl(fbd,FBIOSETBRIGHTNESS,brightness);
         ioctl(fbd,FBIOSETBKLIGHT,onoff);
+        req_lightoff = true;
     }else{
         ioctl(fbd,FBIOSETBRIGHTNESS,0);
         ioctl(fbd,FBIOSETBKLIGHT,onoff);
         ioctl(fbd,FBIOBLANK,0x3);
+        req_lightoff = false;
     }
     close(fbd);
 
@@ -393,6 +406,10 @@ void ScreenLockEngine :: getSysDefine( )
 void ScreenLockEngine :: LoadConfig()
 {
     ifautolock = true;
+    ifhide4sms = true;
+    ifshowdeskicon = true;
+    LANGID = 1;
+
     autolock_interval = 20;
     lock_brightness = 10;
     lock_light_timeout = 3;
@@ -428,17 +445,29 @@ void ScreenLockEngine :: LoadConfig()
     if(DApplication::LoadAppConfig("ShowInstruction",tmp)){
         ifshowinstruction = atoi(tmp);
     }
+    if(DApplication::LoadAppConfig("HideWhileSMSCome",tmp)){
+        ifhide4sms = atoi(tmp);
+    }
+    if(DApplication::LoadAppConfig("ShowAutoLockIcon",tmp)){
+        ifshowdeskicon = atoi(tmp);
+    }
+    if(DApplication::LoadAppConfig("LANGUAGE",tmp)){
+        LANGID = atoi(tmp);
+    }
 }
 
 void ScreenLockEngine :: SaveConfig( )
 {
     DApplication::SaveAppConfig("BackgroundImage",canvas->getBackgroundimg());
+    DApplication::SaveAppConfig("ShowAutoLockIcon",QString::number(ifshowdeskicon).latin1());
     DApplication::SaveAppConfig("AutoLockONOFF",QString::number(ifautolock).latin1());
     DApplication::SaveAppConfig("AutoLockPeriod",QString::number(autolock_interval).latin1());
     DApplication::SaveAppConfig("LockLightOnTimeout",QString::number(lock_light_timeout).latin1());
     DApplication::SaveAppConfig("LockOnBrightness",QString::number(lock_brightness).latin1());
     DApplication::SaveAppConfig("LockLightOnTimeout",QString::number(lock_light_timeout).latin1());
     DApplication::SaveAppConfig("ShowInstruction",QString::number(ifshowinstruction).latin1());
+    DApplication::SaveAppConfig("HideWhileSMSCome",QString::number(ifhide4sms).latin1());
+    DApplication::SaveAppConfig("LANGUAGE",QString::number(LANGID).latin1());
 }
 void ScreenLockEngine :: beforeterminate( )
 {

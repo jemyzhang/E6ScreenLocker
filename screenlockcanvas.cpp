@@ -202,7 +202,6 @@ void ScreenLockCanvas :: iconcheckNoti( )
 
 void ScreenLockCanvas :: setAutoLockimg(bool status)
 {
-    #if 1
     if(status){
         AutoLock_sprite[0]->hide();
         AutoLock_sprite[1]->show();
@@ -212,6 +211,12 @@ void ScreenLockCanvas :: setAutoLockimg(bool status)
         AutoLock_sprite[1]->hide();
     }
     this->update();
-    #endif
+}
+
+
+void ScreenLockCanvas :: hideAutoLockimg()
+{
+    AutoLock_sprite[0]->hide();
+    AutoLock_sprite[1]->hide();
 }
 

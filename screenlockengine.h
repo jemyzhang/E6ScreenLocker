@@ -27,8 +27,13 @@ class ScreenLockEngine : public PointerListener
         bool showpressed;
         bool ishide;
         bool req_update;
+        bool req_lightoff;
         bool ifautolock;
         bool ifshowinstruction;
+        bool ifhide4sms;
+        bool ifshowdeskicon;
+        int LANGID;
+
         unsigned char timecnt;
         unsigned char timeout;
         int autolock_interval;

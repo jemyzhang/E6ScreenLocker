@@ -57,6 +57,7 @@ class ScreenLockCanvas : public QCanvas
         void iconcheckBT( );
         void iconcheckNoti( );
         void setAutoLockimg(bool status);   //status: true/false
+        void hideAutoLockimg( );
         char* getBackgroundimg(){return bgfile;};
     
         ScreenLockCanvas( int w, int h ) : QCanvas( w, h )
