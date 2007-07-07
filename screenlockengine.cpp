@@ -52,7 +52,6 @@ void ScreenLockEngine :: checkprocess( )
             req_update = true;
         }else
         {
-            req_update = false;
             canvas->updateScreenSprite( );
         }
     }
@@ -98,6 +97,9 @@ void ScreenLockEngine :: QCopReceived(int message)
         {
             flag = false;
             startup = false;
+        }
+        if(!ishide && false == startup ) {
+            if(backlightstatus()) req_lightoff = true;
         }
     }
 }
@@ -207,12 +209,12 @@ void ScreenLockEngine :: showScreenSaver()
 
     canvas->iconcheckBT();
     canvas->iconcheckNoti();
-/*
+
     if(true == req_update) {
         canvas->updateScreenSprite( );
         req_update = false;
     }
-*/
+
     view->showFullScreen();
     view->show();
     ishide = false;
