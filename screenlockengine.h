@@ -28,6 +28,7 @@ class ScreenLockEngine : public PointerListener
         bool ishide;
         bool req_update;
         bool req_lightoff;
+        bool req_LCDnonesleep;
         bool ifautolock;
         bool ifshowinstruction;
         bool ifhide4sms;
@@ -48,7 +49,6 @@ class ScreenLockEngine : public PointerListener
         void backlightctrl(bool onoff,int brightness = 10);
         void keylightctrl(bool onoff);
         int backlightstatus( );
-        void incomecheck( );
         void autolock(bool ctrl = true); //screen auto lock
         void getSysDefine( ); //get system defined brightness and lcd sleep time
 
@@ -69,10 +69,7 @@ class ScreenLockEngine : public PointerListener
         void checkprocess( );
         void setview(QCanvasView *canvasview,DApplication *app);
         void pointerPressed( int x, int y );
-        void pointerDragged( int x, int y );
-        void pointerReleased( int x, int y );
         void keyPressed(int keycode);
-        void setAutolockInterval(int interval);
         void QCopReceived(int message);
         void PropertyReceived( );
 };

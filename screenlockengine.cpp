@@ -25,6 +25,7 @@ void ScreenLockEngine :: initial( )
 {
     startup = true;
     ishide = false;
+    req_LCDnonesleep = false;
     getSysDefine( );
     LoadConfig();
     if(autolock_interval == 0){
@@ -48,8 +49,9 @@ void ScreenLockEngine :: checkprocess( )
     time(&now); 
     tm_ptr = localtime(&now);
     if (tm_ptr->tm_sec == 0) {
-        if(ishide){
+        if(ishide || !req_lightoff ){   //while canvas hide or screen light off
             req_update = true;
+            printf("Request screen update...%s",ctime(&now));
         }else
         {
             canvas->updateScreenSprite( );
@@ -57,7 +59,7 @@ void ScreenLockEngine :: checkprocess( )
     }
 
     if (ishide) {
-        timeout = 0;    //for backlight timeout
+        timeout = 0;    //disable backlight timeout
     }else
     {
         if(timeout > lock_light_timeout) {
@@ -81,7 +83,7 @@ void ScreenLockEngine :: checkprocess( )
         timecnt ++;
     }
     autolock( ifautolock );        
-    incomecheck(); // hide canvas while incoming call and show canvas after incoming call
+    //incomecheck(); // hide canvas while incoming call and show canvas after incoming call
 }
 
 void ScreenLockEngine :: QCopReceived(int message)
@@ -134,16 +136,6 @@ void ScreenLockEngine :: pointerPressed( int x, int y )
         canvas->setAutoLockimg(ifautolock);
     }
     
-}
-
-void ScreenLockEngine :: pointerDragged( int x, int y )
-{
-    //std::cout << "Pointer dragged on " << x << "," << y << std::endl;
-}
-
-void ScreenLockEngine :: pointerReleased( int x, int y )
-{
-    //std::cout << "Pointer released on " << x << "," << y << std::endl;
 }
 
 void ScreenLockEngine :: keyPressed(int keycode)
@@ -220,9 +212,10 @@ void ScreenLockEngine :: showScreenSaver()
     ishide = false;
     canvas->advance();
 
-    if(false == backlightstatus()) {
+    if(true == req_LCDnonesleep) {
         printf("Tune LCD Sleep Mode to None...\n");
         PM_setupLcdSleepTime(0);
+        req_LCDnonesleep = false;
     }
     backlightctrl(true,lock_brightness);
 }
@@ -230,12 +223,13 @@ void ScreenLockEngine :: showScreenSaver()
 void ScreenLockEngine :: hideScreenSaver()
 {
     printf("canvas Minimized\n");
-    //view->showMinimized();
     view->hide();
     ishide = true;
     backlightctrl(true,sys_brightness);
-    if (0 == autolock_interval) {
+    if (false == ifautolock) {
+        printf("Recover LCD sleep time to %d\n",sys_lcdsleeptime);
         PM_setupLcdSleepTime(sys_lcdsleeptime);
+        req_LCDnonesleep = true;
     }
 }
 
@@ -300,64 +294,10 @@ int ScreenLockEngine :: backlightstatus( )
     return status;
 }
 
-void ScreenLockEngine :: incomecheck( )
-{
-    static bool fincomecall = false;
-    static bool checktwice = false;
-    static bool fcalling = false;
-
-    bool incall_ = UTIL_GetIncomingCallStatus();
-    bool calling = UTIL_GetPhoneInCall();
-    if (incall_ &&  !ishide) {
-        printf("Incoming Call, canvas hide...\n");
-        hideScreenSaver();
-        if(!backlightstatus()) backlightctrl(true,lock_brightness);
-        timeout = 0;
-        fincomecall = incall_;
-    }else if (fincomecall && !incall_ && ishide && !calling) {
-        if( checktwice)
-        {
-            showScreenSaver();
-            fincomecall = incall_;
-            checktwice = false ;
-        }else
-        {
-            printf("Call rejected or missed, check again................\n");
-            checktwice = true ;
-        }
-    }else if (ishide && calling && fcalling != calling)
-    {
-        printf("Call connected...\n");
-        fcalling = calling;
-        PM_setupLcdSleepTime(sys_lcdsleeptime); //restore lcd sleep time
-    }else if(!calling) fcalling = calling; //reset call status
-}
-
-void ScreenLockEngine :: setAutolockInterval(int interval)
-{
-    autolock_interval = interval;
-    printf("Set autolock interval: %d\n",interval);
-}
-
 void ScreenLockEngine :: autolock(bool ctrl )
 {
-    static bool updatelcdsleep = false;
-
-    if (!ishide) {   //if autolock_interval equals 0, then autolock is disabled
-        updatelcdsleep = false;
+    if (!ishide || !ctrl) {   //if autolock_interval equals 0, then autolock is disabled
         return;
-    }
-
-    if (false == ctrl) {
-        if ( false == updatelcdsleep) {
-            printf("Recover lcdsleeptime to:%d\n",sys_lcdsleeptime);
-            PM_setupLcdSleepTime(sys_lcdsleeptime);
-            updatelcdsleep = true;
-        }
-        return;
-    }else
-    {
-        updatelcdsleep = false;
     }
 
     static int cnt = 0;

@@ -119,7 +119,7 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
                  switch( z )
                  {
                      case 0:
-                         pointerListener->pointerReleased( x, y );
+                         //pointerListener->pointerReleased( x, y );
                      break;
                      case 1:
                          if ( not press )
