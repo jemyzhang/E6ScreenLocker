@@ -1,15 +1,4 @@
-
-#include <ZMessageBox.h>
-
 #include "screenlockengine.h"
-#include "dapplication.h"
-#include <iostream>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/ioctl.h>
-#include <linux/fb.h>
-#include <fcntl.h>
 
 extern "C" int  UTIL_GetIncomingCallStatus();
 extern "C" int  UTIL_GetCallConnectedStatus(void);  
@@ -54,7 +43,7 @@ void ScreenLockEngine :: checkprocess( )
             printf("Request screen update...%s",ctime(&now));
         }else
         {
-            canvas->updateScreenSprite( );
+            canvas->updates( );
         }
     }
 
@@ -78,7 +67,6 @@ void ScreenLockEngine :: checkprocess( )
             keypressed = false;
             canvas->hideString();
             canvas->hideSpriteLock();
-            canvas->update();
         }
         timecnt ++;
     }
@@ -150,13 +138,12 @@ void ScreenLockEngine :: keyPressed(int keycode)
             hidepressed = true ;
             if (ifshowinstruction) {
                 if(0 == LANGID) {
-                    canvas->showString("\n  Unlock: Now Press Right Key.");
+                    canvas->showString("Unlock: Now Press Right Key.");
                 }else{
-                    canvas->showString(utf8->toUnicode("\n         解锁:请再按右方向键."));
+                    canvas->showString(utf8->toUnicode("解锁:请再按右方向键."));
                 }
             }
             canvas->showSpriteLock();
-            canvas->update();
         }else if( 4116 == keycode && true == hidepressed )
         {
             hidepressed = false ;
@@ -166,13 +153,12 @@ void ScreenLockEngine :: keyPressed(int keycode)
             hidepressed = false;
             if (ifshowinstruction) {
                 if( 0 == LANGID ) {
-                    canvas->showString("\n  Unlock: First Press Hangup Key, \n   Then Press Right Key.");
+                    canvas->showString("Unlock: First Press Hangup Key.");
                 }else{
-                    canvas->showString(utf8->toUnicode("\n         解锁:请先按挂机键,\n               再按右方向键."));
+                    canvas->showString(utf8->toUnicode("解锁:请先按挂机键."));
                 }
             }
             canvas->showSpriteLock();
-            canvas->update();
         }
     }else
     {
@@ -199,11 +185,8 @@ void ScreenLockEngine :: showScreenSaver()
 {
     printf("canvas show\n");
 
-    canvas->iconcheckBT();
-    canvas->iconcheckNoti();
-
     if(true == req_update) {
-        canvas->updateScreenSprite( );
+        canvas->updates( );
         req_update = false;
     }
 
@@ -357,30 +340,30 @@ void ScreenLockEngine :: LoadConfig()
     lock_light_timeout = 3;
     ifshowinstruction = true;
     char tmp[10];
-    for(int i = 0; i < sizeof(tmp); i++){
+    for(unsigned int i = 0; i < sizeof(tmp); i++){
         tmp[i] = 0;
     }
     if(DApplication::LoadAppConfig("AutoLockONOFF",tmp)){
         ifautolock = atoi(tmp);
-        for(int i = 0; i < sizeof(tmp); i++){
+        for(unsigned int i = 0; i < sizeof(tmp); i++){
             tmp[i] = 0;
         }
     }
     if(DApplication::LoadAppConfig("AutoLockPeriod",tmp)){
         autolock_interval = atoi(tmp);
-        for(int i = 0; i < sizeof(tmp); i++){
+        for(unsigned int i = 0; i < sizeof(tmp); i++){
             tmp[i] = 0;
         }
     }
     if(DApplication::LoadAppConfig("LockOnBrightness",tmp)){
         lock_brightness = atoi(tmp);
-        for(int i = 0; i < sizeof(tmp); i++){
+        for(unsigned int i = 0; i < sizeof(tmp); i++){
             tmp[i] = 0;
         }
     }
     if(DApplication::LoadAppConfig("LockLightOnTimeout",tmp)){
         lock_light_timeout = atoi(tmp);
-        for(int i = 0; i < sizeof(tmp); i++){
+        for(unsigned int i = 0; i < sizeof(tmp); i++){
             tmp[i] = 0;
         }
     }

@@ -21,6 +21,18 @@
 #include <pthread.h>
 #include <iostream>
 
+#include <qstring.h>
+#include <qtextstream.h>
+#include <qfile.h>
+
+
+#define dbg_printf(fmt,args...) \
+    ((void) ({\
+     if (DEBUG_PRINT) {
+        printf(fmt,## args);
+     }
+    }))
+
 
 class PointerListener
 {
@@ -46,7 +58,8 @@ class DApplication : public ZApplication {
         virtual ~DApplication() {printf("exit application\n");}
         void insertStr(QWSEvent*) {}
 
-        static bool LoadAppConfig(char *name,char *value );
+        static bool LoadConfig(const QString& configfile,const char *name,char *value);
+        static bool LoadAppConfig(const char *name,char *value );
         static bool SaveAppConfig(const char *name,const char *value );
 
         virtual bool qwsEventFilter(QWSEvent* event);

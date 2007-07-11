@@ -1,13 +1,5 @@
-
-#include <qcanvas.h>
-
 #include "screenlock.h"
-#include "screenlockcanvas.h"
-#include "dapplication.h"
-#include "screenlockengine.h"
-#include <qtextcodec.h>
 
-#include <signal.h>
 
 ScreenLockEngine *engine;
 
@@ -48,7 +40,6 @@ int main( int argc, char **argv )
     engine = new ScreenLockEngine( canvas );
     view->showFullScreen( );
     view->show( );
-    //app.setMainWidget( view );
     engine->setview(view,&app);
     engine->initial( );
     app.setPointerListener( (PointerListener*) engine );
@@ -56,6 +47,7 @@ int main( int argc, char **argv )
     signal(SIGALRM,mainloop);
     signal(SIGTERM,killhandle);
     signal(SIGINT,killhandle);
+    signal(SIGSEGV,killhandle);
     struct itimerval value;
     value.it_value.tv_sec = 1;
     value.it_value.tv_usec = 0;

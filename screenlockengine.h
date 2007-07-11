@@ -2,9 +2,18 @@
 #ifndef _SCREENLOCKENGINE_H_
 #define _SCREENLOCKENGINE_H_
 
+#include <ZMessageBox.h>
 #include <qthread.h>
 #include <qfile.h>
 #include <qtextstream.h>
+#include <iostream>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ioctl.h>
+#include <linux/fb.h>
+#include <fcntl.h>
+
 #include "dapplication.h"
 #include "screenlockcanvas.h"
 

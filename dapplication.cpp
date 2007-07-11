@@ -1,12 +1,7 @@
-#include <qstring.h>
-#include <qtextstream.h>
-#include <qfile.h>
 #include "dapplication.h"
 
-bool DApplication :: LoadAppConfig(char *name,char* value )
+bool DApplication :: LoadConfig(const QString& configfile,const char *name,char* value )
 {
-    QString configfile;
-    configfile = "screenlocker.cfg";
     printf("Load %s configuration:",name);
 
     QFile file(configfile);
@@ -27,6 +22,14 @@ bool DApplication :: LoadAppConfig(char *name,char* value )
     }
     printf("\n");
     return false;
+}
+
+
+bool DApplication :: LoadAppConfig(const char *name,char* value )
+{
+    QString configfile;
+    configfile = "screenlocker.cfg";
+    return LoadConfig(configfile,name,value);
 }
 
 bool DApplication :: SaveAppConfig(const char *name,const char *value )
@@ -81,6 +84,7 @@ bool DApplication :: SaveAppConfig(const char *name,const char *value )
        }
 
     printf("Save configuration[%s]\n",name);
+    return true;
 }
 
 bool DApplication :: qwsEventFilter(QWSEvent *event)
@@ -222,3 +226,4 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
     }
     return false;
 }
+
