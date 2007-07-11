@@ -18,13 +18,13 @@ void killhandle(int signo)
     case SIGSEGV:
     case SIGABRT:
     case SIGTERM:
-        printf("catch signal: SIGTERM\n");
+        dbg_printf("catch signal: SIGTERM\n");
         break;
     case SIGINT:
-        printf("catch signal: SIGTERM\n");
+        dbg_printf("catch signal: SIGTERM\n");
         break;
     default:
-        printf("catch signal: UNKNOWN[%d]\n",signo);
+        dbg_printf("catch signal: UNKNOWN[%d]\n",signo);
         return;
     }
     engine->beforeterminate();
@@ -33,7 +33,7 @@ void killhandle(int signo)
 
 int main( int argc, char **argv )
 {
-    printf("ScreenLocker %s by Jemyzhang\n",VERSION);
+    printf("ScreenLocker by Jemyzhang %s %s, %s \n",VERSION,__TIME__,__DATE__);
     DApplication app( argc, argv );
     ScreenLockCanvas *canvas = new ScreenLockCanvas( 236, 316 );
     QCanvasView *view = new QCanvasView( canvas );

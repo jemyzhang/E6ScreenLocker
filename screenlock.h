@@ -9,7 +9,7 @@
 #include "screenlockcanvas.h"
 #include "screenlockengine.h"
 
-#define VERSION "Ver 20070710Build01.10"
+#define VERSION "Ver1.0 Build"
 
 #endif
 

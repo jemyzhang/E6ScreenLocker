@@ -3,10 +3,11 @@
 extern "C" int  UTIL_GetIncomingCallStatus();
 extern "C" int  UTIL_GetCallConnectedStatus(void);  
 extern "C" int  UTIL_GetTimingPhoneLock();
-
+extern "C" int  UTIL_GetPhoneInCall();
 extern "C" int PM_setupLcdSleepTime(int sleepseconds);
 
-extern "C" int  UTIL_GetPhoneInCall();
+extern SKIN_CONFIG_st Skin_CloseClick;
+extern SKIN_CONFIG_st Skin_AutoLock;
 
 QTextCodec *utf8 = QTextCodec::codecForName("UTF-8");
 
@@ -28,7 +29,7 @@ void ScreenLockEngine :: initial( )
     }
     PM_setupLcdSleepTime(0);
     backlightctrl(true,lock_brightness);
-    printf("initial over...\n");
+    dbg_printf("initial over...\n");
 }
 
 void ScreenLockEngine :: checkprocess( )
@@ -40,7 +41,7 @@ void ScreenLockEngine :: checkprocess( )
     if (tm_ptr->tm_sec == 0) {
         if(ishide || !req_lightoff ){   //while canvas hide or screen light off
             req_update = true;
-            printf("Request screen update...%s",ctime(&now));
+            dbg_printf("Request screen update...%s",ctime(&now));
         }else
         {
             canvas->updates( );
@@ -82,7 +83,7 @@ void ScreenLockEngine :: QCopReceived(int message)
             flag = true;
             backlightctrl(false);
             showScreenSaver();
-            printf("force active:%d\n",view->isActiveWindow());
+            dbg_printf("force active:%d\n",view->isActiveWindow());
         }else
         {
             flag = false;
@@ -97,7 +98,7 @@ void ScreenLockEngine :: QCopReceived(int message)
 void ScreenLockEngine :: PropertyReceived( )
 {
     if (!ishide && !startup && ifhide4sms) {
-        printf("What's happend, let's see...\n");
+        dbg_printf("What's happend, let's see...\n");
         hideScreenSaver();
         if(!backlightstatus()) backlightctrl(true,lock_brightness);
         timeout = 0;
@@ -106,13 +107,18 @@ void ScreenLockEngine :: PropertyReceived( )
 
 void ScreenLockEngine :: pointerPressed( int x, int y )
 {
-//    std::cout << "Pointer pressed on " << x << "," << y << std::endl;
-    if( x > 220 && y < 10 )
+    if( x > Skin_CloseClick.cx && 
+        y > Skin_CloseClick.cy &&
+        x < Skin_CloseClick.cx + Skin_CloseClick.width &&
+        y < Skin_CloseClick.cy + Skin_CloseClick.height)
     {
         beforeterminate( );
         DApplication :: exit();
         ::exit( 0 );
-    }else if (x > 110 && y > 300 && x < 130) {
+    }else if (x > Skin_AutoLock.cx && 
+        y > Skin_AutoLock.cy &&
+        x < Skin_AutoLock.cx + Skin_AutoLock.width &&
+        y < Skin_AutoLock.cy + Skin_AutoLock.height) {
         if(!ifshowdeskicon) return;
         if (ifautolock) {
             ifautolock = false;
@@ -120,7 +126,7 @@ void ScreenLockEngine :: pointerPressed( int x, int y )
         {
             ifautolock = true;
         }
-        printf("auto lock mode: %d\n",ifautolock);
+        dbg_printf("auto lock mode: %d\n",ifautolock);
         canvas->setAutoLockimg(ifautolock);
     }
     
@@ -183,7 +189,7 @@ void ScreenLockEngine :: setview(QCanvasView *canvasview,DApplication *app)
 
 void ScreenLockEngine :: showScreenSaver()
 {
-    printf("canvas show\n");
+    dbg_printf("canvas show\n");
 
     if(true == req_update) {
         canvas->updates( );
@@ -196,7 +202,7 @@ void ScreenLockEngine :: showScreenSaver()
     canvas->advance();
 
     if(true == req_LCDnonesleep) {
-        printf("Tune LCD Sleep Mode to None...\n");
+        dbg_printf("Tune LCD Sleep Mode to None...\n");
         PM_setupLcdSleepTime(0);
         req_LCDnonesleep = false;
     }
@@ -205,12 +211,12 @@ void ScreenLockEngine :: showScreenSaver()
 
 void ScreenLockEngine :: hideScreenSaver()
 {
-    printf("canvas Minimized\n");
+    dbg_printf("canvas Minimized\n");
     view->hide();
     ishide = true;
     backlightctrl(true,sys_brightness);
     if (false == ifautolock) {
-        printf("Recover LCD sleep time to %d\n",sys_lcdsleeptime);
+        dbg_printf("Recover LCD sleep time to %d\n",sys_lcdsleeptime);
         PM_setupLcdSleepTime(sys_lcdsleeptime);
         req_LCDnonesleep = true;
     }
@@ -220,7 +226,7 @@ void ScreenLockEngine :: backlightctrl(bool onoff,int brightness)
 {
     int fbd = open("/dev/fb0", O_RDWR);
     if(fbd<0){
-    printf("can not open fb0\n");
+    dbg_printf("can not open fb0\n");
     return;
     }
     if(onoff){
@@ -236,7 +242,7 @@ void ScreenLockEngine :: backlightctrl(bool onoff,int brightness)
     }
     close(fbd);
 
-    printf("Set backlight %s\n",onoff == true ?  "ON" : "OFF");
+    dbg_printf("Set backlight %s\n",onoff == true ?  "ON" : "OFF");
     keylightctrl(onoff);
 }
 
@@ -244,7 +250,7 @@ void ScreenLockEngine :: keylightctrl(bool onoff)
 {
     int keyd = open("/dev/keylight", O_RDWR);
     if(keyd<0){
-    printf("can not open keylight device\n");
+    dbg_printf("can not open keylight device\n");
     return;
     }
     if(onoff){
@@ -254,7 +260,7 @@ void ScreenLockEngine :: keylightctrl(bool onoff)
     }
     close(keyd);
 
-    printf("Set keylight %s\n",onoff == true ?  "ON" : "OFF");
+    dbg_printf("Set keylight %s\n",onoff == true ?  "ON" : "OFF");
 }
 
 int ScreenLockEngine :: backlightstatus( )
@@ -263,17 +269,17 @@ int ScreenLockEngine :: backlightstatus( )
     int fbd = open("/dev/fb0", O_RDWR);
     int status = 0;
     if(fbd<0){
-    printf("can not open fb0\n");
+    dbg_printf("can not open fb0\n");
     return false ;
     }
  
     if(ioctl(fbd,FBIOGETBKLIGHT,&status) < 0)
     {
-        printf("backlight status : get status error\n");
+        dbg_printf("backlight status : get status error\n");
     }
 
     close(fbd);
-    printf("Backlight status %d\n",status);
+    dbg_printf("Backlight status %d\n",status);
     return status;
 }
 
@@ -291,7 +297,7 @@ void ScreenLockEngine :: autolock(bool ctrl )
         cnt ++;
     }
     if (cnt > autolock_interval) {
-            printf("Screen is autolocked...\n");
+            dbg_printf("Screen is autolocked...\n");
             cnt = 0;
             backlightctrl(false,lock_brightness);
             showScreenSaver();
@@ -300,7 +306,7 @@ void ScreenLockEngine :: autolock(bool ctrl )
 
 void ScreenLockEngine :: getSysDefine( )
 {
-    printf("Load system settings...");
+    dbg_printf("Load system settings...");
     QFile file("/ezx_user/download/appwrite/setup/ezx_system.cfg");
 
     sys_brightness = 0x19;
@@ -314,16 +320,16 @@ void ScreenLockEngine :: getSysDefine( )
             line = stream.readLine();
             if(line.contains("Brightness = ")) {
                 sscanf(line.latin1(),"%s = %d",tmp,&sys_brightness);
-                printf("brightness:%d ",sys_brightness);
+                dbg_printf("brightness:%d ",sys_brightness);
             }else if(line.contains("LcdSleepTime = ")){
                 sscanf(line.latin1(),"%s = %d",tmp,&sys_lcdsleeptime);
                 sys_lcdsleeptime = lcdsleeptime_ref[sys_lcdsleeptime];
-                printf("lcdsleeptime:%d\n",sys_lcdsleeptime);
+                dbg_printf("lcdsleeptime:%d\n",sys_lcdsleeptime);
             }
         }
         file.close();
     }else{
-        printf("failed,use default value\n");
+        dbg_printf("failed,use default value\n");
     }
 
 }

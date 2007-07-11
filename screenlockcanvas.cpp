@@ -21,7 +21,6 @@ SKIN_CONFIG_st Skin_LockIcon;
 SKIN_CONFIG_st Skin_CloseClick;
 SKIN_CONFIG_st Skin_Bluetooth;
 
-
 const SKIN_CONFIGS skinconfigs[] = {
     {"TimeDigi",&Skin_TimeDigi},
     {"TimeColon",&Skin_TimeColon},
@@ -48,9 +47,9 @@ void ScreenLockCanvas :: init( )
 
     ficonlock = false;
 
-    printf("load skin config.......\n");
+    dbg_printf("load skin config.......\n");
     loadSkinConfig("skin/skin.cfg");
-    printf("load skin png......\n");
+    dbg_printf("load skin png......\n");
     loadSkin("skin/skin.png");
 
     strfont = new QFont();
@@ -68,7 +67,7 @@ void ScreenLockCanvas :: loadSkin(const QString &png)
             delete skin;
         skin = tmp;
     }else {
-        printf("skin image load error\n");
+        dbg_printf("skin image load error\n");
     }
 }
 
@@ -120,7 +119,7 @@ void ScreenLockCanvas :: get_time_ch( )
     digi_buf[9] = tmp / 10;
     digi_buf[10] = tmp % 10;
     digi_buf[11] = tm_ptr->tm_wday;
-    printf("Ready for output date %s\n",ctime(&now));
+    dbg_printf("Ready for output date %s\n",ctime(&now));
 }
 
 void ScreenLockCanvas :: loadBGimg( )
@@ -182,7 +181,7 @@ void ScreenLockCanvas :: updateScreenSprite( )
     loadBGimg();
     get_time_ch();
 
-    printf("start to prepare image...\n");
+    dbg_printf("start to prepare image...\n");
     int offset[] = {0,0,1,1,0,0,0,1,1,2,2};
     int cx,cy,px,py;
 
@@ -276,7 +275,7 @@ void ScreenLockCanvas :: iconcheckBT( )
 void ScreenLockCanvas :: iconcheckNoti( )
 {
     bool fnotifi = UTIL_GetNotificationStatus();
-    printf("Notification status: %d\n",fnotifi);
+    dbg_printf("Notification status: %d\n",fnotifi);
     if(fnotifi)
     {
         showSpritesms();
@@ -354,5 +353,5 @@ void ScreenLockCanvas :: updates()
     main_sprite->show();
     
     update();
-    printf("canvas updated\n");
+    dbg_printf("canvas updated\n");
 }

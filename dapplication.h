@@ -25,14 +25,13 @@
 #include <qtextstream.h>
 #include <qfile.h>
 
-
+#define DEBUG_PRINT 0
 #define dbg_printf(fmt,args...) \
-    ((void) ({\
-     if (DEBUG_PRINT) {
-        printf(fmt,## args);
-     }
+    ((void) ({ \
+     if (DEBUG_PRINT) \
+        printf(fmt,## args); \
+     0; \
     }))
-
 
 class PointerListener
 {
@@ -55,7 +54,7 @@ class DApplication : public ZApplication {
         {
             pointerListener = 0;
         }
-        virtual ~DApplication() {printf("exit application\n");}
+        virtual ~DApplication() {dbg_printf("exit application\n");}
         void insertStr(QWSEvent*) {}
 
         static bool LoadConfig(const QString& configfile,const char *name,char *value);

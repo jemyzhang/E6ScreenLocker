@@ -80,7 +80,7 @@ class ScreenLockCanvas : public QCanvas
 
     
     virtual ~ScreenLockCanvas( ) {
-        printf("delete image source\n");
+        dbg_printf("delete image source\n");
     		}
 
 };

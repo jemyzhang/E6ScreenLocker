@@ -2,7 +2,7 @@
 
 bool DApplication :: LoadConfig(const QString& configfile,const char *name,char* value )
 {
-    printf("Load %s configuration:",name);
+    dbg_printf("Load %s configuration:",name);
 
     QFile file(configfile);
     if(file.exists () && file.open( IO_ReadOnly )) {
@@ -13,14 +13,14 @@ bool DApplication :: LoadConfig(const QString& configfile,const char *name,char*
             line = stream.readLine();
             if (line.contains (name)) {
                 sscanf(line,"%s = %s",tmp,value);
-                printf("%s\n",value);
+                dbg_printf("%s\n",value);
                 file.close();
                 return true;
             }
         }
         file.close();
     }
-    printf("\n");
+    dbg_printf("\n");
     return false;
 }
 
@@ -83,7 +83,7 @@ bool DApplication :: SaveAppConfig(const char *name,const char *value )
            file2.close();
        }
 
-    printf("Save configuration[%s]\n",name);
+    dbg_printf("Save configuration[%s]\n",name);
     return true;
 }
 
@@ -103,11 +103,11 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
          
      switch(event->type) {
          case QWSEvent::NoEvent:
-             printf("no event\n");
+             dbg_printf("no event\n");
          break;
 
          case QWSEvent::Connected:
-             printf("connected\n");
+             dbg_printf("connected\n");
          break;
          
          case QWSEvent::Mouse:
@@ -146,7 +146,7 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
              KeyEvent = (QWSKeyEvent*) event;
              if (KeyEvent==0)
                  return 0;
-             printf("key %d %d %d\n",
+             dbg_printf("key %d %d %d\n",
                  KeyEvent->simpleData.keycode,
                  KeyEvent->simpleData.is_press,
                  KeyEvent->simpleData.is_auto_repeat);
@@ -161,11 +161,11 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
          break;
          
          case QWSEvent::RegionModified:
-             printf("RegionModified\n");
+             dbg_printf("RegionModified\n");
          break;
          
          case QWSEvent::Creation:
-             printf("Creation\n");
+             dbg_printf("Creation\n");
          break;
          
          case QWSEvent::PropertyNotify:
@@ -173,7 +173,7 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
                  return 0;
              pointerListener->PropertyReceived();
 /*                
-             printf("propertyNotify %d %d %d\n",
+             dbg_printf("propertyNotify %d %d %d\n",
                  propertyNotify->simpleData.window,
                  propertyNotify->simpleData.property,
                  propertyNotify->simpleData.state);
@@ -181,28 +181,28 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
          break;
          
          case QWSEvent::PropertyReply:
-             printf("PropertyReply\n");
+             dbg_printf("PropertyReply\n");
          break;
          
          case QWSEvent::SelectionClear:
-             printf("SelectionClear\n");
+             dbg_printf("SelectionClear\n");
          break;
          
          case QWSEvent::SelectionRequest:
-             printf("SelectionRequest\n");
+             dbg_printf("SelectionRequest\n");
          break;
          
          case QWSEvent::SelectionNotify:
-             printf("SelectionNotify\n");
+             dbg_printf("SelectionNotify\n");
          break;
          
          case QWSEvent::MaxWindowRect:
-             printf("MaxWindowRect\n");
+             dbg_printf("MaxWindowRect\n");
          break;
          
          case QWSEvent::QCopMessage:
              QCop = (QWSQCopMessageEvent *)event;
-             printf("QCopMessage %d %d %d\n",
+             dbg_printf("QCopMessage %d %d %d\n",
                  QCop->simpleData.lchannel,
                  QCop->simpleData.ldata,
                  QCop->simpleData.lmessage);
@@ -213,15 +213,15 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
          break;
          
          case QWSEvent::WindowOperation:
-             printf("WindowOperation\n");
+             dbg_printf("WindowOperation\n");
          break;
          
          case QWSEvent::IMEvent:
-             printf("IMEvent\n");
+             dbg_printf("IMEvent\n");
          break;
          
          case QWSEvent::NEvent:
-             printf("NEvent\n");
+             dbg_printf("NEvent\n");
          break;
     }
     return false;
