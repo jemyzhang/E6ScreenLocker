@@ -24,7 +24,7 @@
 #include <qstring.h>
 #include <qtextstream.h>
 #include <qfile.h>
-
+#include <signal.h>
 #define DEBUG_PRINT 0
 #define dbg_printf(fmt,args...) \
     ((void) ({ \
@@ -62,6 +62,7 @@ class DApplication : public ZApplication {
         static bool SaveAppConfig(const char *name,const char *value );
 
         virtual bool qwsEventFilter(QWSEvent* event);
+        static void loopTimer(int seconds);
      
       void setPointerListener( PointerListener *listener )
       {

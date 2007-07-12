@@ -44,8 +44,10 @@ class ScreenLockEngine : public PointerListener
         bool ifshowdeskicon;
         int LANGID;
 
-        unsigned char timecnt;
-        unsigned char timeout;
+        unsigned char keytimeout;
+        unsigned char lightimeout;
+        int onSleepTimer;
+        bool sleepmode;
         int autolock_interval;
         int lock_light_timeout;
         int lock_brightness;
@@ -65,13 +67,6 @@ class ScreenLockEngine : public PointerListener
         ScreenLockEngine( ScreenLockCanvas *canvas_ )
         {
             canvas = canvas_;
-            keypressed = false;
-            hidepressed = false;
-            showpressed = false;
-            ishide = false;
-            startup = false;
-            timecnt = 0;
-            timeout = 0;
         }
         void initial( );
         void beforeterminate( );

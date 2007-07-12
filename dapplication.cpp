@@ -1,5 +1,20 @@
 #include "dapplication.h"
 
+void DApplication :: loopTimer(int seconds)
+{
+    struct itimerval value;
+    value.it_value.tv_sec = seconds;
+    value.it_value.tv_usec = 0;
+    value.it_interval = value.it_value;
+    setitimer(ITIMER_REAL, &value,NULL);
+    if (0 == seconds) {
+        dbg_printf("went to sleep mode...\n");
+    }else
+    {
+        dbg_printf("wakeup,timer set to %d seconds...\n",seconds);
+    }
+}
+
 bool DApplication :: LoadConfig(const QString& configfile,const char *name,char* value )
 {
     dbg_printf("Load %s configuration:",name);
@@ -100,7 +115,6 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
      int kcode;
      if (!event)
          return false;
-         
      switch(event->type) {
          case QWSEvent::NoEvent:
              dbg_printf("no event\n");

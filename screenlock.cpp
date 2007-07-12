@@ -48,13 +48,7 @@ int main( int argc, char **argv )
     signal(SIGTERM,killhandle);
     signal(SIGINT,killhandle);
     signal(SIGSEGV,killhandle);
-    struct itimerval value;
-    value.it_value.tv_sec = 1;
-    value.it_value.tv_usec = 0;
-    value.it_interval.tv_sec = 1;
-    value.it_interval.tv_usec = 0; 
-    setitimer(ITIMER_REAL, &value,NULL);
-
+    app.loopTimer(1);
     return app.exec( );
 }
 

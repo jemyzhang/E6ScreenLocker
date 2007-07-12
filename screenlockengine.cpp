@@ -15,6 +15,14 @@ void ScreenLockEngine :: initial( )
 {
     startup = true;
     ishide = false;
+    keypressed = false;
+    hidepressed = false;
+    showpressed = false;
+    ishide = false;
+    keytimeout = 0;
+    lightimeout = 0;
+    onSleepTimer = 0;
+    sleepmode = false;
     req_LCDnonesleep = false;
     getSysDefine( );
     LoadConfig();
@@ -34,6 +42,31 @@ void ScreenLockEngine :: initial( )
 
 void ScreenLockEngine :: checkprocess( )
 {
+
+    if (ishide) {
+        lightimeout = 0;    //disable backlight timeout
+        onSleepTimer = 0;
+        autolock( ifautolock );
+    }else
+    {
+        onSleepTimer ++;
+        if (onSleepTimer > autolock_interval * 2 ) {
+            DApplication::loopTimer(0);
+            sleepmode = true;
+            onSleepTimer = 0;
+            keytimeout = 0;
+            lightimeout = 0;
+            return;
+        }
+
+        if(lightimeout > lock_light_timeout) {
+            lightimeout = 0;
+            backlightctrl(false);
+        }
+        if(req_lightoff) lightimeout ++;
+    }
+
+
     struct tm *tm_ptr;
     time_t now;
     time(&now); 
@@ -48,30 +81,18 @@ void ScreenLockEngine :: checkprocess( )
         }
     }
 
-    if (ishide) {
-        timeout = 0;    //disable backlight timeout
-    }else
-    {
-        if(timeout > lock_light_timeout) {
-            timeout = 0;
-            backlightctrl(false);
-        }
-        if(req_lightoff) timeout ++;
-    }
-
     if( true == keypressed)
     {
-        if ( timecnt > 1 ){
-            timecnt = 0;
+        if ( keytimeout > 1 ){
+            keytimeout = 0;
             hidepressed = false;
             showpressed = false;
             keypressed = false;
             canvas->hideString();
             canvas->hideSpriteLock();
         }
-        timecnt ++;
+        keytimeout ++;
     }
-    autolock( ifautolock );        
     //incomecheck(); // hide canvas while incoming call and show canvas after incoming call
 }
 
@@ -101,7 +122,12 @@ void ScreenLockEngine :: PropertyReceived( )
         dbg_printf("What's happend, let's see...\n");
         hideScreenSaver();
         if(!backlightstatus()) backlightctrl(true,lock_brightness);
-        timeout = 0;
+        lightimeout = 0;
+        onSleepTimer = 0;
+        if(sleepmode) {
+            sleepmode = false;
+            DApplication :: loopTimer(1);
+        }
     }
 }
 
@@ -135,9 +161,14 @@ void ScreenLockEngine :: pointerPressed( int x, int y )
 void ScreenLockEngine :: keyPressed(int keycode)
 {
     keypressed = true ;
-    timecnt = 0;
+    keytimeout = 0;
+    onSleepTimer = 0;
+    if(sleepmode) {
+        sleepmode = false;
+        DApplication :: loopTimer(1);
+    }
     if (false == ishide) {
-        timeout = 0;
+        lightimeout = 0;
         showScreenSaver();
         if(4145 == keycode)
         {
@@ -285,7 +316,7 @@ int ScreenLockEngine :: backlightstatus( )
 
 void ScreenLockEngine :: autolock(bool ctrl )
 {
-    if (!ishide || !ctrl) {   //if autolock_interval equals 0, then autolock is disabled
+    if (!ctrl) {   //if autolock_interval equals 0, then autolock is disabled
         return;
     }
 
