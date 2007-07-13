@@ -154,7 +154,7 @@ void ScreenLockCanvas :: showSpritesms( )
     bitBlt(mainscreen,Skin_MissMail.cx,Skin_MissMail.cy,
            skin,Skin_MissMail.px,Skin_MissMail.py,
            Skin_MissMail.width,Skin_MissMail.height);
-    bitBlt(mainscreen,Skin_MissCall.cx,Skin_MissMail.cy,
+    bitBlt(mainscreen,Skin_MissCall.cx,Skin_MissCall.cy,
            skin,Skin_MissCall.px,Skin_MissCall.py,
            Skin_MissCall.width,Skin_MissCall.height);
 }

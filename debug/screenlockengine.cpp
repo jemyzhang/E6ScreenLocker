@@ -4,7 +4,7 @@ extern "C" int  UTIL_GetIncomingCallStatus();
 extern "C" int  UTIL_GetCallConnectedStatus(void);  
 extern "C" int  UTIL_GetTimingPhoneLock();
 extern "C" int  UTIL_GetPhoneInCall();
-extern "C" int PM_setupLcdSleepTime(int sleepseconds);
+//extern "C" int PM_setupLcdSleepTime(int sleepseconds);
 
 extern SKIN_CONFIG_st Skin_CloseClick;
 extern SKIN_CONFIG_st Skin_AutoLock;
@@ -35,7 +35,7 @@ void ScreenLockEngine :: initial( )
     {
         canvas->hideAutoLockimg();
     }
-    PM_setupLcdSleepTime(0);
+    //PM_setupLcdSleepTime(0);
     backlightctrl(true,lock_brightness);
     dbg_printf("initial over...\n");
 }
@@ -99,10 +99,20 @@ void ScreenLockEngine :: checkprocess( )
 void ScreenLockEngine :: QCopReceived(int message)
 {
     static bool flag = false;
+    static bool reqLCDoff = true;
+    if (6 == message && !ishide) {
+        if(!backlightstatus()) {
+            reqLCDoff = true;
+        }
+    }
     if (message == 5) {
+        if (reqLCDoff) {
+            reqLCDoff = false;
+            if(!ishide) backlightctrl(false);
+        }
         if (!ishide && !(view->isActiveWindow()) && false == flag && false == startup) {
             flag = true;
-            backlightctrl(false);
+            //backlightctrl(false);
             showScreenSaver();
             dbg_printf("force active:%d\n",view->isActiveWindow());
         }else
@@ -234,7 +244,7 @@ void ScreenLockEngine :: showScreenSaver()
 
     if(true == req_LCDnonesleep) {
         dbg_printf("Tune LCD Sleep Mode to None...\n");
-        PM_setupLcdSleepTime(0);
+        //PM_setupLcdSleepTime(0);
         req_LCDnonesleep = false;
     }
     backlightctrl(true,lock_brightness);
@@ -248,7 +258,7 @@ void ScreenLockEngine :: hideScreenSaver()
     backlightctrl(true,sys_brightness);
     if (false == ifautolock) {
         dbg_printf("Recover LCD sleep time to %d\n",sys_lcdsleeptime);
-        PM_setupLcdSleepTime(sys_lcdsleeptime);
+        //PM_setupLcdSleepTime(sys_lcdsleeptime);
         req_LCDnonesleep = true;
     }
 }
@@ -330,7 +340,7 @@ void ScreenLockEngine :: autolock(bool ctrl )
     if (cnt > autolock_interval) {
             dbg_printf("Screen is autolocked...\n");
             cnt = 0;
-            backlightctrl(false,lock_brightness);
+            //backlightctrl(false);
             showScreenSaver();
     }
 }
@@ -434,6 +444,6 @@ void ScreenLockEngine :: SaveConfig( )
 void ScreenLockEngine :: beforeterminate( )
 {
     SaveConfig();
-    PM_setupLcdSleepTime(sys_lcdsleeptime);
+    //PM_setupLcdSleepTime(sys_lcdsleeptime);
     backlightctrl(true,sys_brightness);
 }
