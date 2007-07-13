@@ -1,0 +1,4 @@
+export PATH=/usr/local/arm/bin:/home/mkezx/tmake-1.8/bin:$PATH
+export QTDIR=/home/mkezx/qt-2.3.6
+export TMAKEPATH=/home/mkezx/tmake-1.8/lib/qws/linux-e680-g++
+export LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH
