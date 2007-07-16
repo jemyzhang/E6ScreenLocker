@@ -4,7 +4,7 @@ extern "C" int  UTIL_GetIncomingCallStatus();
 extern "C" int  UTIL_GetCallConnectedStatus(void);  
 extern "C" int  UTIL_GetTimingPhoneLock();
 extern "C" int  UTIL_GetPhoneInCall();
-//extern "C" int PM_setupLcdSleepTime(int sleepseconds);
+extern "C" int PM_setupLcdSleepTime(int sleepseconds);
 
 extern SKIN_CONFIG_st Skin_CloseClick;
 extern SKIN_CONFIG_st Skin_AutoLock;
@@ -35,7 +35,7 @@ void ScreenLockEngine :: initial( )
     {
         canvas->hideAutoLockimg();
     }
-    //PM_setupLcdSleepTime(0);
+    setlcdsleeptime(0);
     backlightctrl(true,lock_brightness);
     dbg_printf("initial over...\n");
 }
@@ -52,6 +52,7 @@ void ScreenLockEngine :: checkprocess( )
         onSleepTimer ++;
         if (onSleepTimer > autolock_interval * 2 ) {
             DApplication::loopTimer(0);
+            setlcdsleeptime(1);
             sleepmode = true;
             onSleepTimer = 0;
             keytimeout = 0;
@@ -72,13 +73,7 @@ void ScreenLockEngine :: checkprocess( )
     time(&now); 
     tm_ptr = localtime(&now);
     if (tm_ptr->tm_sec == 0) {
-        if(ishide || !req_lightoff ){   //while canvas hide or screen light off
-            req_update = true;
-            dbg_printf("Request screen update...%s",ctime(&now));
-        }else
-        {
             canvas->updates( );
-        }
     }
 
     if( true == keypressed)
@@ -90,10 +85,10 @@ void ScreenLockEngine :: checkprocess( )
             keypressed = false;
             canvas->hideString();
             canvas->hideSpriteLock();
+            canvas->updates();
         }
         keytimeout ++;
     }
-    //incomecheck(); // hide canvas while incoming call and show canvas after incoming call
 }
 
 void ScreenLockEngine :: QCopReceived(int message)
@@ -108,7 +103,7 @@ void ScreenLockEngine :: QCopReceived(int message)
     if (message == 5) {
         if (reqLCDoff) {
             reqLCDoff = false;
-            if(!ishide) backlightctrl(false);
+            if(!ishide && sleepmode) showScreenSaver();
         }
         if (!ishide && !(view->isActiveWindow()) && false == flag && false == startup) {
             flag = true;
@@ -131,13 +126,8 @@ void ScreenLockEngine :: PropertyReceived( )
     if (!ishide && !startup && ifhide4sms) {
         dbg_printf("What's happend, let's see...\n");
         hideScreenSaver();
-        if(!backlightstatus()) backlightctrl(true,lock_brightness);
         lightimeout = 0;
         onSleepTimer = 0;
-        if(sleepmode) {
-            sleepmode = false;
-            DApplication :: loopTimer(1);
-        }
     }
 }
 
@@ -172,14 +162,8 @@ void ScreenLockEngine :: keyPressed(int keycode)
 {
     keypressed = true ;
     keytimeout = 0;
-    onSleepTimer = 0;
-    if(sleepmode) {
-        sleepmode = false;
-        DApplication :: loopTimer(1);
-    }
     if (false == ishide) {
         lightimeout = 0;
-        showScreenSaver();
         if(4145 == keycode)
         {
             hidepressed = true ;
@@ -191,6 +175,7 @@ void ScreenLockEngine :: keyPressed(int keycode)
                 }
             }
             canvas->showSpriteLock();
+            showScreenSaver();
         }else if( 4116 == keycode && true == hidepressed )
         {
             hidepressed = false ;
@@ -206,6 +191,7 @@ void ScreenLockEngine :: keyPressed(int keycode)
                 }
             }
             canvas->showSpriteLock();
+            showScreenSaver();
         }
     }else
     {
@@ -232,10 +218,12 @@ void ScreenLockEngine :: showScreenSaver()
 {
     dbg_printf("canvas show\n");
 
-    if(true == req_update) {
-        canvas->updates( );
-        req_update = false;
+    if(sleepmode) {
+        sleepmode = false;
+        DApplication :: loopTimer(1);
     }
+
+    canvas->updates( );
 
     view->showFullScreen();
     view->show();
@@ -243,9 +231,7 @@ void ScreenLockEngine :: showScreenSaver()
     canvas->advance();
 
     if(true == req_LCDnonesleep) {
-        dbg_printf("Tune LCD Sleep Mode to None...\n");
-        //PM_setupLcdSleepTime(0);
-        req_LCDnonesleep = false;
+        setlcdsleeptime(0);
     }
     backlightctrl(true,lock_brightness);
 }
@@ -253,14 +239,16 @@ void ScreenLockEngine :: showScreenSaver()
 void ScreenLockEngine :: hideScreenSaver()
 {
     dbg_printf("canvas Minimized\n");
+    if (!ifautolock || sleepmode) {
+        setlcdsleeptime(sys_lcdsleeptime);
+    }
+    if(sleepmode) {
+        sleepmode = false;
+        DApplication :: loopTimer(1);
+    }
     view->hide();
     ishide = true;
     backlightctrl(true,sys_brightness);
-    if (false == ifautolock) {
-        dbg_printf("Recover LCD sleep time to %d\n",sys_lcdsleeptime);
-        //PM_setupLcdSleepTime(sys_lcdsleeptime);
-        req_LCDnonesleep = true;
-    }
 }
 
 void ScreenLockEngine :: backlightctrl(bool onoff,int brightness)
@@ -444,6 +432,20 @@ void ScreenLockEngine :: SaveConfig( )
 void ScreenLockEngine :: beforeterminate( )
 {
     SaveConfig();
-    //PM_setupLcdSleepTime(sys_lcdsleeptime);
+    setlcdsleeptime(sys_lcdsleeptime);
     backlightctrl(true,sys_brightness);
 }
+
+void ScreenLockEngine :: setlcdsleeptime(int second)
+{
+    if (second > 0) {
+        req_LCDnonesleep = true;
+    }else
+    {
+        req_LCDnonesleep = false;
+    }
+    PM_setupLcdSleepTime(second);
+    dbg_printf("Set LCD sleep time to %d...\n",second);
+}
+
+

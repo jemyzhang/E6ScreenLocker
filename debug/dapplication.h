@@ -25,7 +25,7 @@
 #include <qtextstream.h>
 #include <qfile.h>
 #include <signal.h>
-#define DEBUG_PRINT 0
+#define DEBUG_PRINT 1
 #define dbg_printf(fmt,args...) \
     ((void) ({ \
      if (DEBUG_PRINT) \
