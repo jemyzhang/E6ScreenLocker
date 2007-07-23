@@ -62,6 +62,7 @@ class ScreenLockEngine : public PointerListener
         int backlightstatus( );
         void autolock(bool ctrl = true); //screen auto lock
         void getSysDefine( ); //get system defined brightness and lcd sleep time
+        void setlcdsleeptime(int second);
 
     public:
         ScreenLockEngine( ScreenLockCanvas *canvas_ )

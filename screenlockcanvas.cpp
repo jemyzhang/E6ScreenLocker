@@ -140,13 +140,11 @@ void ScreenLockCanvas :: loadBGimg( )
 void ScreenLockCanvas :: showSpriteLock( )
 {
     ficonlock = true;
-    updates();
 }
 
 void ScreenLockCanvas :: hideSpriteLock( )
 {
     ficonlock = false;
-    updates();
 }
 
 void ScreenLockCanvas :: showSpritesms( )
@@ -244,13 +242,11 @@ void ScreenLockCanvas :: showString( const QString& info)
 {
     infomsg = info;
     ftextmsg = true;
-    updates();
 }
 
 void ScreenLockCanvas :: hideString( )
 {
     ftextmsg = false;
-    updates();
 }
 
 void ScreenLockCanvas :: textcheckmsg()

@@ -112,7 +112,7 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
      QWSPropertyNotifyEvent *propertyNotify;
      
      int x,y,z;
-     int kcode;
+ //    int kcode,kunicode;
      if (!event)
          return false;
      switch(event->type) {
@@ -160,15 +160,13 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
              KeyEvent = (QWSKeyEvent*) event;
              if (KeyEvent==0)
                  return 0;
-             dbg_printf("key %d %d %d\n",
+             dbg_printf("key %d,%d %d %d\n",
+                 KeyEvent->simpleData.window,
                  KeyEvent->simpleData.keycode,
                  KeyEvent->simpleData.is_press,
                  KeyEvent->simpleData.is_auto_repeat);
-             kcode = KeyEvent->simpleData.keycode;
-             if(kcode == 4118 || kcode == 4119 || kcode == 4169 || kcode == 4171 || kcode == 4172) {
-                 //
-             }
-
+//             kcode = KeyEvent->simpleData.keycode;
+//             if(kcode == 4118 || kcode == 4119 || kcode == 4169 || kcode == 4171 || kcode == 4172) {
              if (KeyEvent->simpleData.is_press && !KeyEvent->simpleData.is_auto_repeat) {
                  pointerListener->keyPressed(KeyEvent->simpleData.keycode);
              }
@@ -186,12 +184,12 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
              if (propertyNotify==0)
                  return 0;
              pointerListener->PropertyReceived();
-/*                
+                
              dbg_printf("propertyNotify %d %d %d\n",
                  propertyNotify->simpleData.window,
                  propertyNotify->simpleData.property,
                  propertyNotify->simpleData.state);
-*/ 
+ 
          break;
          
          case QWSEvent::PropertyReply:
@@ -221,9 +219,6 @@ bool DApplication :: qwsEventFilter(QWSEvent *event)
                  QCop->simpleData.ldata,
                  QCop->simpleData.lmessage);
              pointerListener->QCopReceived(QCop->simpleData.lmessage);
-             if(QCop->simpleData.lmessage == 6) {
-                 return true;
-             }
          break;
          
          case QWSEvent::WindowOperation:
