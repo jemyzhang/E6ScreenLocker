@@ -65,15 +65,15 @@ void ScreenLockEngine :: checkprocess( )
             backlightctrl(false);
         }
         if(req_lightoff) lightimeout ++;
-    }
 
 
-    struct tm *tm_ptr;
-    time_t now;
-    time(&now); 
-    tm_ptr = localtime(&now);
-    if (tm_ptr->tm_sec == 0) {
-            canvas->updates( );
+        struct tm *tm_ptr;
+        time_t now;
+        time(&now); 
+        tm_ptr = localtime(&now);
+        if (tm_ptr->tm_sec == 0) {
+                canvas->updates( );
+        }
     }
 
     if( true == keypressed)
@@ -160,10 +160,10 @@ void ScreenLockEngine :: pointerPressed( int x, int y )
 
 void ScreenLockEngine :: keyPressed(int keycode)
 {
-    keypressed = true ;
-    keytimeout = 0;
     if (false == ishide) {
         lightimeout = 0;
+        keypressed = true ;
+        keytimeout = 0;
         if(4145 == keycode)
         {
             hidepressed = true ;
@@ -239,9 +239,9 @@ void ScreenLockEngine :: showScreenSaver()
 void ScreenLockEngine :: hideScreenSaver()
 {
     dbg_printf("canvas Minimized\n");
-    if (!ifautolock || sleepmode) {
+//    if (!ifautolock || sleepmode) {
         setlcdsleeptime(sys_lcdsleeptime);
-    }
+//    }
     if(sleepmode) {
         sleepmode = false;
         DApplication :: loopTimer(1);
